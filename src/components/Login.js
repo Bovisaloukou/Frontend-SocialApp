@@ -1,0 +1,67 @@
+// /src/components/Login.js
+import React, { useState } from 'react';
+import { useNavigate } from 'react-router-dom';
+
+const Login = () => {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [error, setError] = useState('');
+  const navigate = useNavigate();
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+  
+    try {
+      const response = await fetch('http://localhost:5000/users/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password })
+      });
+  
+      if (response.ok) {
+        const data = await response.json();  // Assurez-vous que la réponse est au format JSON
+        if (data.token) {
+          localStorage.setItem('token', data.token);
+          navigate('/events');
+        } else {
+          setError(data.error || 'Erreur lors de la connexion');
+        }
+      } else {
+        setError('Erreur lors de la connexion : ' + response.status);
+      }
+    } catch (err) {
+      setError('Une erreur réseau s\'est produite, veuillez réessayer.');
+    }
+  };
+  
+
+  return (
+    <div className="max-w-md mx-auto mt-10 p-4 bg-white shadow-md rounded-lg">
+      <h2 className="text-2xl font-bold mb-6 text-center">Connexion</h2>
+      <form onSubmit={handleSubmit}>
+        <input
+          type="email"
+          placeholder="Email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          required
+          className="w-full p-2 mb-4 border border-gray-300 rounded"
+        />
+        <input
+          type="password"
+          placeholder="Mot de passe"
+          value={password}
+          onChange={(e) => setPassword(e.target.value)}
+          required
+          className="w-full p-2 mb-4 border border-gray-300 rounded"
+        />
+        <button type="submit" className="w-full p-2 bg-blue-600 text-white rounded hover:bg-blue-700">
+          Se connecter
+        </button>
+      </form>
+      {error && <p className="text-red-500 mt-4">{error}</p>}
+    </div>
+  );
+};
+
+export default Login;
