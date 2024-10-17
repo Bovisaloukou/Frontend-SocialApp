@@ -7,6 +7,7 @@ import Register from './components/Register';
 import EventsList from './components/EventsList';
 import CreateEvent from './components/CreateEvent';
 import EventQRCode from './components/EventQRCode';
+import ConfessionList from './components/ConfessionList'; // Import du composant ConfessionList
 
 function App() {
   return (
@@ -18,6 +19,7 @@ function App() {
         <Route path="/events" element={<EventsList />} />
         <Route path="/create-event" element={<CreateEvent />} />
         <Route path="/events/:id/qrcode" element={<EventQRCode />} />
+        <Route path="/confessions" element={<ConfessionList />} /> {/* Nouvelle route pour ConfessionList */}
       </Routes>
     </Router>
   );

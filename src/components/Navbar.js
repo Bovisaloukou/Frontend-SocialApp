@@ -33,6 +33,9 @@ const Navbar = () => {
               <Link to="/create-event" className="text-white hover:text-gray-300">Créer un événement</Link>
             </li>
             <li>
+              <Link to="/confessions" className="text-white hover:text-gray-300">Confessions</Link> {/* Lien vers la page des Confessions */}
+            </li>
+            <li>
               <button onClick={handleLogout} className="text-white hover:text-gray-300">Se déconnecter</button>
             </li>
           </>
