@@ -53,9 +53,10 @@ const ConfessionList = () => {
         if (replyContent.trim() === '') return;
     
         try {
+            const backendUrl = process.env.REACT_APP_BACKEND_URL;
             const endpoint = parentReplyId 
-                ? `${BACKEND_URL}/api/confessions/${confessionId}/replies/${parentReplyId}`  // Sous-réponse
-                : `${BACKEND_URL}/api/confessions/${confessionId}/replies`;  // Réponse normale
+                ? `${backendUrl}/api/confessions/${confessionId}/replies/${parentReplyId}`  // Sous-réponse
+                : `${backendUrl}/api/confessions/${confessionId}/replies`;  // Réponse normale
     
             const response = await fetch(endpoint, {
                 method: 'POST',
