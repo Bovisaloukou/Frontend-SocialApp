@@ -101,8 +101,9 @@ const ConfessionList = () => {
                         <p className="text-gray-800 mb-4">{confession.content}</p>
 
                         <div className="flex space-x-4 text-gray-500">
-                            <span>😂 {confession.reactions?.get('😂') || 0}</span>
-                            <span>❤️ {confession.reactions?.get('❤️') || 0}</span>
+                            {/* Accéder aux réactions comme un objet standard */}
+                            <span>😂 {confession.reactions?.['😂'] || 0}</span>
+                            <span>❤️ {confession.reactions?.['❤️'] || 0}</span>
                         </div>
 
                         <div className="mt-4 border-t pt-4">
