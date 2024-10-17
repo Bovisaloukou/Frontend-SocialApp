@@ -51,22 +51,22 @@ const ConfessionList = () => {
 
     const handleAddReply = async (confessionId, replyContent, parentReplyId = null) => {
         if (replyContent.trim() === '') return;
-
+    
         try {
             const endpoint = parentReplyId 
                 ? `${BACKEND_URL}/api/confessions/${confessionId}/replies/${parentReplyId}`  // Sous-réponse
                 : `${BACKEND_URL}/api/confessions/${confessionId}/replies`;  // Réponse normale
-
+    
             const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ content: replyContent })
             });
-
+    
             if (!response.ok) {
                 throw new Error('Erreur lors de la création de la réponse.');
             }
-
+    
             const updatedConfession = await response.json();
             setConfessions(confessions.map(confession => 
                 confession._id === confessionId ? updatedConfession : confession
@@ -74,7 +74,7 @@ const ConfessionList = () => {
         } catch (err) {
             setError(err.message);
         }
-    };
+    };    
 
     const renderReplies = (replies, confessionId, parentReplyId = null) => {
         return (
