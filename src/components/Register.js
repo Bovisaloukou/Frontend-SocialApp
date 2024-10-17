@@ -14,7 +14,8 @@ const Register = () => {
     setError(''); // Reset error before making the request
   
     try {
-      const response = await fetch('http://localhost:5000/users/register', {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL;
+      const response = await fetch(`${backendUrl}/users/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password })

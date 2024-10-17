@@ -23,7 +23,8 @@ const CreateEvent = () => {
   // Fetch de la liste des utilisateurs
 useEffect(() => {
     const fetchUsers = async () => {
-      const response = await fetch('http://localhost:5000/users/users/', {
+      const backendUrl = process.env.REACT_APP_BACKEND_URL;
+      const response = await fetch(`${backendUrl}/users/users/`, {
         headers: {
           Authorization: `Bearer ${localStorage.getItem('token')}`
         }
@@ -48,7 +49,8 @@ useEffect(() => {
       title, description, date, location, isPrivate, invitedUsers
   });  // Log pour vérifier les données avant l'envoi
 
-    const response = await fetch('http://localhost:5000/events/events', {
+    const backendUrl = process.env.REACT_APP_BACKEND_URL;
+    const response = await fetch(`${backendUrl}/events/events`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',

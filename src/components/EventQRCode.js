@@ -9,7 +9,8 @@ const EventQRCode = () => {
     useEffect(() => {
         const fetchQRCode = async () => {
             const token = localStorage.getItem('token');
-            const response = await fetch(`http://localhost:5000/events/${id}/qrcode`, {
+            const backendUrl = process.env.REACT_APP_BACKEND_URL;
+            const response = await fetch(`${backendUrl}/events/${id}/qrcode`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             const data = await response.json();
