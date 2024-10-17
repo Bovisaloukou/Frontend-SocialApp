@@ -72,41 +72,53 @@ const ConfessionList = () => {
         }
     };
 
-    if (loading) return <p>Chargement des confessions...</p>;
-    if (error) return <p>{error}</p>;
+    if (loading) return <p className="text-center text-gray-500">Chargement des confessions...</p>;
+    if (error) return <p className="text-center text-red-500">{error}</p>;
 
     return (
-        <div>
-            <h2>Confessions Anonymes</h2>
-            <textarea
-                value={newConfession}
-                onChange={(e) => setNewConfession(e.target.value)}
-                placeholder="Partagez votre confession..."
-                rows="3"
-                style={{ width: '100%', padding: '10px' }}
-            />
-            <button onClick={handlePostConfession}>Poster</button>
+        <div className="container mx-auto mt-8 p-4">
+            <h2 className="text-3xl font-bold text-center mb-6 text-blue-600">Confessions Anonymes</h2>
 
-            <ul>
+            <div className="mb-6">
+                <textarea
+                    value={newConfession}
+                    onChange={(e) => setNewConfession(e.target.value)}
+                    placeholder="Partagez votre confession..."
+                    rows="3"
+                    className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
+                />
+                <button
+                    onClick={handlePostConfession}
+                    className="mt-2 w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                >
+                    Poster
+                </button>
+            </div>
+
+            <ul className="space-y-6">
                 {confessions.map(confession => (
-                    <li key={confession._id} style={{ marginBottom: '20px', border: '1px solid #ddd', padding: '10px' }}>
-                        <p>{confession.content}</p>
-                        <div>
+                    <li key={confession._id} className="bg-white p-6 shadow-lg rounded-lg border border-gray-200">
+                        <p className="text-gray-800 mb-4">{confession.content}</p>
+
+                        <div className="flex space-x-4 text-gray-500">
                             <span>😂 {confession.reactions?.get('😂') || 0}</span>
                             <span>❤️ {confession.reactions?.get('❤️') || 0}</span>
                         </div>
 
-                        <div style={{ marginTop: '10px' }}>
-                            <h4>Réponses :</h4>
-                            <ul>
+                        <div className="mt-4 border-t pt-4">
+                            <h4 className="text-lg font-semibold text-gray-600">Réponses :</h4>
+                            <ul className="space-y-2 mt-2">
                                 {confession.replies?.length > 0 ? (
                                     confession.replies.map((reply, index) => (
-                                        <li key={index} style={{ marginBottom: '5px' }}>
-                                            <p>{reply.content} - <em>{new Date(reply.createdAt).toLocaleString()}</em></p>
+                                        <li key={index} className="bg-gray-100 p-2 rounded-lg">
+                                            <p className="text-gray-700">{reply.content}</p>
+                                            <p className="text-sm text-gray-500">
+                                                <em>{new Date(reply.createdAt).toLocaleString()}</em>
+                                            </p>
                                         </li>
                                     ))
                                 ) : (
-                                    <p>Aucune réponse pour cette confession.</p>
+                                    <p className="text-gray-500">Aucune réponse pour cette confession.</p>
                                 )}
                             </ul>
                         </div>
@@ -121,7 +133,7 @@ const ConfessionList = () => {
                                     e.target.value = '';  // Réinitialiser après l'envoi
                                 }
                             }}
-                            style={{ width: '100%', padding: '10px', marginTop: '10px' }}
+                            className="mt-4 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
                         />
                     </li>
                 ))}
