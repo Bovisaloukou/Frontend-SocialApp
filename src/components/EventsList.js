@@ -21,13 +21,10 @@ const EventsList = () => {
     useEffect(() => {
         const getUserDataFromToken = () => {
             const token = localStorage.getItem('token');
-            //console.log(token)
             if (token) {
                 try {
                     const payload = JSON.parse(atob(token.split('.')[1])); // Décoder le token JWT
-                    //console.log(payload)
                     setUserEmail(payload.email); // Extraire l'email du token
-                    //console.log('Email utilisateur extrait du token:', payload.email); // Log de vérification
                 } catch (error) {
                     console.error('Erreur lors du décodage du token JWT:', error);
                 }
@@ -55,30 +52,25 @@ const EventsList = () => {
                     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
                 });
 
-                console.log('Requête envoyée, réponse:', response);
-
                 // Vérification du statut de la réponse avant de parser le JSON
                 if (!response.ok) {
                     throw new Error(`Erreur réseau: ${response.status} - ${response.statusText}`);
                 }
-                const data = await response.json(); // Cette ligne peut générer l'erreur si la réponse n'est pas du JSON valide
+
+                const data = await response.json(); // Lire les données une seule fois
                 if (!data) {
                     throw new Error('Données invalides reçues');
                 }
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log('Données des événements récupérées:', data);
-                    const { publicEvents = [], privateEvents = [] } = data;
 
-                    const privateEventsForUser = privateEvents.filter(event =>
-                        event.invitations && event.invitations.includes(userEmail)
-                    );
-                    console.log(privateEventsForUser)
+                console.log('Données des événements récupérées:', data);
+                const { publicEvents = [], privateEvents = [] } = data;
 
-                    setEvents([...publicEvents, ...privateEventsForUser]); // Mise à jour des événements dans le state
-                } else {
-                    console.error('Erreur lors de la récupération des événements:', response.status);
-                }
+                const privateEventsForUser = privateEvents.filter(event =>
+                    event.invitations && event.invitations.includes(userEmail)
+                );
+                console.log(privateEventsForUser);
+
+                setEvents([...publicEvents, ...privateEventsForUser]); // Mise à jour des événements dans le state
             } catch (error) {
                 console.error('Erreur lors de la requête de récupération des événements:', error);
             }
@@ -87,7 +79,7 @@ const EventsList = () => {
         };
 
         if (userEmail) {
-            console.log('Lancement de la récupération des événements pour:', userEmail); // Log de vérification
+            console.log('Lancement de la récupération des événements pour:', userEmail);
             fetchEvents();
         }
     }, [userEmail, navigate]);        
