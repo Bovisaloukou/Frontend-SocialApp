@@ -52,11 +52,19 @@ const EventsList = () => {
             try {
                 const backendUrl = process.env.REACT_APP_BACKEND_URL;
                 const response = await fetch(`${backendUrl}/api/events`, {
-                    headers: { Authorization: `Bearer ${token}` }
+                    headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
                 });
 
                 console.log('Requête envoyée, réponse:', response);
 
+                // Vérification du statut de la réponse avant de parser le JSON
+                if (!response.ok) {
+                    throw new Error(`Erreur réseau: ${response.status} - ${response.statusText}`);
+                }
+                const data = await response.json(); // Cette ligne peut générer l'erreur si la réponse n'est pas du JSON valide
+                if (!data) {
+                    throw new Error('Données invalides reçues');
+                }
                 if (response.ok) {
                     const data = await response.json();
                     console.log('Données des événements récupérées:', data);
