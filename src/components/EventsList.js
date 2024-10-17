@@ -50,7 +50,8 @@ const EventsList = () => {
             }
 
             try {
-                const response = await fetch('http://localhost:5000/events/events', {
+                const backendUrl = process.env.REACT_APP_BACKEND_URL;
+                const response = await fetch(`${backendUrl}/events/events`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 
