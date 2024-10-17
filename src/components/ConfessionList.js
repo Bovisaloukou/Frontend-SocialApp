@@ -234,9 +234,9 @@ const ConfessionList = () => {
                         {showReplies[confession._id] && (
                             <div className="mt-4 border-t pt-4">
                                 <h4 className="text-lg font-semibold text-gray-600">Réponses :</h4>
-                                {confession.replies.length === 0 ? (
+                                {!confession.replies || confession.replies.length === 0 ? (
                                     <p className="text-gray-500">Aucune réponse pour le moment, soyez le premier à commenter.</p>
-                                ) : (
+                                    ) : (
                                     renderReplies(confession.replies, confession._id)
                                 )}
                             </div>
