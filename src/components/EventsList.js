@@ -48,6 +48,9 @@ const EventsList = () => {
 
             try {
                 const backendUrl = process.env.REACT_APP_BACKEND_URL;
+
+                console.log('Token utilisé pour la requête:', localStorage.getItem('token'));
+                
                 const response = await fetch(`${backendUrl}/api/events`, {
                     headers: { Authorization: `Bearer ${localStorage.getItem('token')}` }
                 });
