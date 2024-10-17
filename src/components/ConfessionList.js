@@ -6,6 +6,8 @@ const ConfessionList = () => {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
     const [replyInputs, setReplyInputs] = useState({}); // Pour stocker l'état d'affichage des réponses
+    const [showReplies, setShowReplies] = useState({}); // Pour stocker l'état de "voir les réponses"
+    const [replyLimit, setReplyLimit] = useState({}); // Limite d'affichage des réponses pour chaque confession
     const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
     useEffect(() => {
@@ -77,7 +79,6 @@ const ConfessionList = () => {
         }
     };
 
-    // Nouvelle fonction pour incrémenter les émojis
     const handleReaction = async (confessionId, emoji) => {
         try {
             const response = await fetch(`${BACKEND_URL}/api/confessions/${confessionId}/reactions`, {
@@ -99,18 +100,27 @@ const ConfessionList = () => {
         }
     };
 
-    // Gérer l'affichage/masquage de l'input de réponse
-    const toggleReplyInput = (confessionId) => {
+    const toggleReplyInput = (replyId) => {
         setReplyInputs(prev => ({
             ...prev,
-            [confessionId]: !prev[confessionId] // Toggle l'affichage de l'input
+            [replyId]: !prev[replyId] // Toggle l'affichage de l'input
+        }));
+    };
+
+    const toggleShowReplies = (confessionId) => {
+        setShowReplies(prev => ({
+            ...prev,
+            [confessionId]: !prev[confessionId] // Toggle affichage des réponses
         }));
     };
 
     const renderReplies = (replies, confessionId, parentReplyId = null) => {
+        const limit = replyLimit[confessionId] || 2; // Limiter les réponses à 2 par défaut
+        const visibleReplies = replies.slice(0, limit); // Afficher seulement les réponses visibles
+
         return (
             <ul className="space-y-2 mt-2">
-                {replies.map((reply, index) => (
+                {visibleReplies.map((reply, index) => (
                     <li key={index} className="bg-gray-100 p-2 rounded-lg">
                         <p className="text-gray-700">{reply.content}</p>
                         <p className="text-sm text-gray-500">
@@ -150,6 +160,18 @@ const ConfessionList = () => {
                         )}
                     </li>
                 ))}
+                {/* Bouton "Voir plus" */}
+                {replies.length > limit && (
+                    <button
+                        onClick={() => setReplyLimit(prev => ({
+                            ...prev,
+                            [confessionId]: limit + 5 // Augmenter de 5 à chaque clic
+                        }))}
+                        className="text-blue-500 hover:underline"
+                    >
+                        Voir plus
+                    </button>
+                )}
             </ul>
         );
     };
@@ -168,6 +190,7 @@ const ConfessionList = () => {
                     placeholder="Partagez votre confession..."
                     rows="3"
                     className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
+                    style={{ wordWrap: 'break-word' }} // Fixe le débordement du texte
                 />
                 <button
                     onClick={handlePostConfession}
@@ -180,46 +203,44 @@ const ConfessionList = () => {
             <ul className="space-y-6">
                 {confessions.map(confession => (
                     <li key={confession._id} className="bg-white p-6 shadow-lg rounded-lg border border-gray-200">
-                        <p className="text-gray-800 mb-4">{confession.content}</p>
+                        <p className="text-gray-800 mb-4" style={{ wordWrap: 'break-word' }}>{confession.content}</p>
 
                         {/* Section des réactions avec plus d'émojis */}
                         <div className="flex space-x-4 text-gray-500">
-                            <button onClick={() => handleReaction(confession._id, '😂')}>😂 {confession.reactions?.['😂'] || 0}</button>
-                            <button onClick={() => handleReaction(confession._id, '❤️')}>❤️ {confession.reactions?.['❤️'] || 0}</button>
-                            <button onClick={() => handleReaction(confession._id, '👍')}>👍 {confession.reactions?.['👍'] || 0}</button>
-                            <button onClick={() => handleReaction(confession._id, '😮')}>😮 {confession.reactions?.['😮'] || 0}</button>
+                            <button onClick={() => handleReaction(confession._id, '😂')} className="focus:outline-none">
+                                😂 {confession.reactions?.['😂'] || 0}
+                            </button>
+                            <button onClick={() => handleReaction(confession._id, '❤️')} className="focus:outline-none">
+                                ❤️ {confession.reactions?.['❤️'] || 0}
+                            </button>
+                            <button onClick={() => handleReaction(confession._id, '👍')} className="focus:outline-none">
+                                👍 {confession.reactions?.['👍'] || 0}
+                            </button>
+                            <button onClick={() => handleReaction(confession._id, '😮')} className="focus:outline-none">
+                                😮 {confession.reactions?.['😮'] || 0}
+                            </button>
                         </div>
 
-                        {/* Lien pour afficher l'input de réponse */}
+                        {/* Lien pour afficher les réponses */}
                         <a
                             href="#!"
-                            onClick={() => toggleReplyInput(confession._id)}
+                            onClick={() => toggleShowReplies(confession._id)}
                             className="text-sm text-blue-500 hover:underline mt-4 block"
                         >
-                            Répondre
+                            {showReplies[confession._id] ? 'Masquer les réponses' : 'Voir les réponses'}
                         </a>
 
-                        {/* Input pour répondre à la confession */}
-                        {replyInputs[confession._id] && (
-                            <textarea
-                                placeholder="Répondre à cette confession..."
-                                rows="2"
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter' && !e.shiftKey) {
-                                        e.preventDefault();
-                                        handleAddReply(confession._id, e.target.value); // Pas de parentReplyId ici
-                                        e.target.value = ''; // Réinitialiser après l'envoi
-                                    }
-                                }}
-                                className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
-                            />
-                        )}
-
                         {/* Affichage des réponses */}
-                        <div className="mt-4 border-t pt-4">
-                            <h4 className="text-lg font-semibold text-gray-600">Réponses :</h4>
-                            {renderReplies(confession.replies, confession._id)}
-                        </div>
+                        {showReplies[confession._id] && (
+                            <div className="mt-4 border-t pt-4">
+                                <h4 className="text-lg font-semibold text-gray-600">Réponses :</h4>
+                                {confession.replies.length === 0 ? (
+                                    <p className="text-gray-500">Aucune réponse pour le moment, soyez le premier à commenter.</p>
+                                ) : (
+                                    renderReplies(confession.replies, confession._id)
+                                )}
+                            </div>
+                        )}
                     </li>
                 ))}
             </ul>
