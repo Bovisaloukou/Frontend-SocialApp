@@ -42,18 +42,22 @@ const ConfessionList = () => {
             }
 
             const data = await response.json();
-            setConfessions([data, ...confessions]);  // Ajouter la nouvelle confession au début
+            setConfessions([data, ...confessions]);
             setNewConfession('');
         } catch (err) {
             setError(err.message);
         }
     };
 
-    const handleAddReply = async (confessionId, replyContent) => {
+    const handleAddReply = async (confessionId, replyContent, parentReplyId = null) => {
         if (replyContent.trim() === '') return;
 
         try {
-            const response = await fetch(`${BACKEND_URL}/api/confessions/${confessionId}/replies`, {
+            const endpoint = parentReplyId 
+                ? `${BACKEND_URL}/api/confessions/${confessionId}/replies/${parentReplyId}`  // Sous-réponse
+                : `${BACKEND_URL}/api/confessions/${confessionId}/replies`;  // Réponse normale
+
+            const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ content: replyContent })
@@ -70,6 +74,42 @@ const ConfessionList = () => {
         } catch (err) {
             setError(err.message);
         }
+    };
+
+    const renderReplies = (replies, confessionId, parentReplyId = null) => {
+        return (
+            <ul className="space-y-2 mt-2">
+                {replies.map((reply, index) => (
+                    <li key={index} className="bg-gray-100 p-2 rounded-lg">
+                        <p className="text-gray-700">{reply.content}</p>
+                        <p className="text-sm text-gray-500">
+                            <em>{new Date(reply.createdAt).toLocaleString()}</em>
+                        </p>
+
+                        {/* Sous-réponses */}
+                        {reply.replies?.length > 0 && (
+                            <div className="ml-4">
+                                {renderReplies(reply.replies, confessionId, reply._id)}
+                            </div>
+                        )}
+
+                        {/* Formulaire pour répondre à cette réponse */}
+                        <textarea
+                            placeholder="Répondre à cette réponse..."
+                            rows="2"
+                            onKeyDown={(e) => {
+                                if (e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault();
+                                    handleAddReply(confessionId, e.target.value, reply._id);  // Passer l'ID de la réponse parent
+                                    e.target.value = '';  // Réinitialiser après l'envoi
+                                }
+                            }}
+                            className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
+                        />
+                    </li>
+                ))}
+            </ul>
+        );
     };
 
     if (loading) return <p className="text-center text-gray-500">Chargement des confessions...</p>;
@@ -108,29 +148,17 @@ const ConfessionList = () => {
 
                         <div className="mt-4 border-t pt-4">
                             <h4 className="text-lg font-semibold text-gray-600">Réponses :</h4>
-                            <ul className="space-y-2 mt-2">
-                                {confession.replies?.length > 0 ? (
-                                    confession.replies.map((reply, index) => (
-                                        <li key={index} className="bg-gray-100 p-2 rounded-lg">
-                                            <p className="text-gray-700">{reply.content}</p>
-                                            <p className="text-sm text-gray-500">
-                                                <em>{new Date(reply.createdAt).toLocaleString()}</em>
-                                            </p>
-                                        </li>
-                                    ))
-                                ) : (
-                                    <p className="text-gray-500">Aucune réponse pour cette confession.</p>
-                                )}
-                            </ul>
+                            {renderReplies(confession.replies, confession._id)}
                         </div>
 
+                        {/* Formulaire pour répondre à la confession */}
                         <textarea
-                            placeholder="Répondre anonymement..."
+                            placeholder="Répondre à cette confession..."
                             rows="2"
                             onKeyDown={(e) => {
                                 if (e.key === 'Enter' && !e.shiftKey) {
                                     e.preventDefault();
-                                    handleAddReply(confession._id, e.target.value);
+                                    handleAddReply(confession._id, e.target.value);  // Pas de parentReplyId ici, car c'est une réponse à la confession
                                     e.target.value = '';  // Réinitialiser après l'envoi
                                 }
                             }}
