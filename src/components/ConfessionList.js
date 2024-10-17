@@ -5,7 +5,7 @@ const ConfessionList = () => {
     const [newConfession, setNewConfession] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-
+    const [replyInputs, setReplyInputs] = useState({}); // Pour stocker l'état d'affichage des réponses
     const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
     useEffect(() => {
@@ -51,31 +51,61 @@ const ConfessionList = () => {
 
     const handleAddReply = async (confessionId, replyContent, parentReplyId = null) => {
         if (replyContent.trim() === '') return;
-    
+
         try {
             const backendUrl = process.env.REACT_APP_BACKEND_URL;
-            const endpoint = parentReplyId 
-                ? `${backendUrl}/api/confessions/${confessionId}/replies/${parentReplyId}`  // Sous-réponse
-                : `${backendUrl}/api/confessions/${confessionId}/replies`;  // Réponse normale
-    
+            const endpoint = parentReplyId
+                ? `${backendUrl}/api/confessions/${confessionId}/replies/${parentReplyId}` // Sous-réponse
+                : `${backendUrl}/api/confessions/${confessionId}/replies`; // Réponse normale
+
             const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ content: replyContent })
             });
-    
+
             if (!response.ok) {
                 throw new Error('Erreur lors de la création de la réponse.');
             }
-    
+
             const updatedConfession = await response.json();
-            setConfessions(confessions.map(confession => 
+            setConfessions(confessions.map(confession =>
                 confession._id === confessionId ? updatedConfession : confession
             ));
         } catch (err) {
             setError(err.message);
         }
-    };    
+    };
+
+    // Nouvelle fonction pour incrémenter les émojis
+    const handleReaction = async (confessionId, emoji) => {
+        try {
+            const response = await fetch(`${BACKEND_URL}/api/confessions/${confessionId}/reactions`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ emoji })
+            });
+
+            if (!response.ok) {
+                throw new Error('Erreur lors de l\'ajout de la réaction.');
+            }
+
+            const updatedConfession = await response.json();
+            setConfessions(confessions.map(confession =>
+                confession._id === confessionId ? updatedConfession : confession
+            ));
+        } catch (err) {
+            setError(err.message);
+        }
+    };
+
+    // Gérer l'affichage/masquage de l'input de réponse
+    const toggleReplyInput = (confessionId) => {
+        setReplyInputs(prev => ({
+            ...prev,
+            [confessionId]: !prev[confessionId] // Toggle l'affichage de l'input
+        }));
+    };
 
     const renderReplies = (replies, confessionId, parentReplyId = null) => {
         return (
@@ -94,19 +124,30 @@ const ConfessionList = () => {
                             </div>
                         )}
 
+                        {/* Lien pour répondre à cette réponse */}
+                        <a
+                            href="#!"
+                            onClick={() => toggleReplyInput(reply._id)}
+                            className="text-sm text-blue-500 hover:underline mt-2 block"
+                        >
+                            Répondre
+                        </a>
+
                         {/* Formulaire pour répondre à cette réponse */}
-                        <textarea
-                            placeholder="Répondre à cette réponse..."
-                            rows="2"
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' && !e.shiftKey) {
-                                    e.preventDefault();
-                                    handleAddReply(confessionId, e.target.value, reply._id);  // Passer l'ID de la réponse parent
-                                    e.target.value = '';  // Réinitialiser après l'envoi
-                                }
-                            }}
-                            className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
-                        />
+                        {replyInputs[reply._id] && (
+                            <textarea
+                                placeholder="Répondre à cette réponse..."
+                                rows="2"
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                        e.preventDefault();
+                                        handleAddReply(confessionId, e.target.value, reply._id);
+                                        e.target.value = ''; // Réinitialiser après l'envoi
+                                    }
+                                }}
+                                className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
+                            />
+                        )}
                     </li>
                 ))}
             </ul>
@@ -141,30 +182,44 @@ const ConfessionList = () => {
                     <li key={confession._id} className="bg-white p-6 shadow-lg rounded-lg border border-gray-200">
                         <p className="text-gray-800 mb-4">{confession.content}</p>
 
+                        {/* Section des réactions avec plus d'émojis */}
                         <div className="flex space-x-4 text-gray-500">
-                            {/* Accéder aux réactions comme un objet standard */}
-                            <span>😂 {confession.reactions?.['😂'] || 0}</span>
-                            <span>❤️ {confession.reactions?.['❤️'] || 0}</span>
+                            <button onClick={() => handleReaction(confession._id, '😂')}>😂 {confession.reactions?.['😂'] || 0}</button>
+                            <button onClick={() => handleReaction(confession._id, '❤️')}>❤️ {confession.reactions?.['❤️'] || 0}</button>
+                            <button onClick={() => handleReaction(confession._id, '👍')}>👍 {confession.reactions?.['👍'] || 0}</button>
+                            <button onClick={() => handleReaction(confession._id, '😮')}>😮 {confession.reactions?.['😮'] || 0}</button>
                         </div>
 
+                        {/* Lien pour afficher l'input de réponse */}
+                        <a
+                            href="#!"
+                            onClick={() => toggleReplyInput(confession._id)}
+                            className="text-sm text-blue-500 hover:underline mt-4 block"
+                        >
+                            Répondre
+                        </a>
+
+                        {/* Input pour répondre à la confession */}
+                        {replyInputs[confession._id] && (
+                            <textarea
+                                placeholder="Répondre à cette confession..."
+                                rows="2"
+                                onKeyDown={(e) => {
+                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                        e.preventDefault();
+                                        handleAddReply(confession._id, e.target.value); // Pas de parentReplyId ici
+                                        e.target.value = ''; // Réinitialiser après l'envoi
+                                    }
+                                }}
+                                className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
+                            />
+                        )}
+
+                        {/* Affichage des réponses */}
                         <div className="mt-4 border-t pt-4">
                             <h4 className="text-lg font-semibold text-gray-600">Réponses :</h4>
                             {renderReplies(confession.replies, confession._id)}
                         </div>
-
-                        {/* Formulaire pour répondre à la confession */}
-                        <textarea
-                            placeholder="Répondre à cette confession..."
-                            rows="2"
-                            onKeyDown={(e) => {
-                                if (e.key === 'Enter' && !e.shiftKey) {
-                                    e.preventDefault();
-                                    handleAddReply(confession._id, e.target.value);  // Pas de parentReplyId ici, car c'est une réponse à la confession
-                                    e.target.value = '';  // Réinitialiser après l'envoi
-                                }
-                            }}
-                            className="mt-4 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
-                        />
                     </li>
                 ))}
             </ul>
