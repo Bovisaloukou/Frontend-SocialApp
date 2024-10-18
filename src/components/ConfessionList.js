@@ -65,7 +65,7 @@ const ConfessionList = () => {
     
             const newReply = await response.json();
             
-            // Mettre à jour l'état local des confessions
+            // Mettre à jour l'état local des confessions avec la nouvelle réponse
             const updatedConfessions = confessions.map(confession => {
                 if (confession._id === confessionId) {
                     return updateReplies(confession, parentReplyId, newReply);
@@ -73,27 +73,30 @@ const ConfessionList = () => {
                 return confession;
             });
     
-            setConfessions(updatedConfessions);  // Mise à jour locale
+            setConfessions(updatedConfessions);  // Mise à jour locale des confessions
     
-            // Forcer l'affichage des réponses après l'ajout
+            // Forcer l'affichage des réponses et du lien "Voir les réponses" après l'ajout
             setShowReplies(prev => ({
                 ...prev,
                 [confessionId]: true  // Assurer que la section des réponses est visible
             }));
     
+            // Masquer l'input de réponse après l'envoi
             setInputVisibility(prev => ({
                 ...prev,
-                [parentReplyId || confessionId]: false  // Masquer l'input après envoi
+                [parentReplyId || confessionId]: false
             }));
+    
+            // Réinitialiser le champ de réponse
             setReplyInputs(prev => ({
                 ...prev,
-                [parentReplyId || confessionId]: ''  // Réinitialiser le champ de réponse
+                [parentReplyId || confessionId]: ''
             }));
     
         } catch (error) {
             setError(error.message);
         }
-    };          
+    };              
 
     const updateReplies = (confession, parentReplyId, newReply) => {
         const updatedReplies = confession.replies.map(reply => {
@@ -177,6 +180,7 @@ const ConfessionList = () => {
     const renderConfessionRepliesOrMessage = (confession) => {
         return (
             <>
+                {/* Le lien "Voir les réponses" doit toujours apparaître si la confession a au moins une réponse */}
                 {confession.replies.length > 0 && (
                     <a
                         href="#!"
@@ -187,7 +191,7 @@ const ConfessionList = () => {
                     </a>
                 )}
     
-                {/* Assurer que les réponses sont visibles après l'ajout */}
+                {/* Affiche les réponses si elles sont visibles */}
                 {showReplies[confession._id] && renderReplies(confession.replies, confession._id)}
     
                 {/* Toujours afficher le lien "Répondre" pour répondre directement à la confession */}
@@ -219,7 +223,7 @@ const ConfessionList = () => {
                 )}
             </>
         );
-    };            
+    };                
 
     if (loading) return <p className="text-center text-gray-500">Chargement des confessions...</p>;
     if (error) return <p className="text-center text-red-500">{error}</p>;
