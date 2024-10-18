@@ -76,8 +76,8 @@ const ConfessionList = () => {
             setConfessions(confessions.map(confession =>
                 confession._id === confessionId ? updatedConfession : confession
             ));
-        } catch (err) {
-            setError(err.message);
+        } catch (error) {
+            console.error('Erreur lors de la création de la sous-réponse :', error);
         }
     };
 
@@ -122,17 +122,17 @@ const ConfessionList = () => {
                         </a>
                         {replyInputs[reply._id] && (
                             <textarea
-                                placeholder="Répondre à cette réponse..."
-                                rows="2"
-                                onKeyDown={(e) => {
-                                    if (e.key === 'Enter' && !e.shiftKey) {
-                                        e.preventDefault();
-                                        handleAddReply(confessionId, e.target.value, reply._id);
-                                        e.target.value = '';
-                                    }
-                                }}
-                                className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
-                            />
+                            placeholder="Répondre à cette réponse..."
+                            rows="2"
+                            onKeyDown={(e) => {
+                                if (e.target && e.key === 'Enter' && !e.shiftKey) {
+                                    e.preventDefault();
+                                    handleAddReply(confession._id, e.target.value, reply._id);
+                                    e.target.value = '';  // Réinitialiser après avoir ajouté la réponse
+                                }
+                            }}
+                            className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
+                        />                        
                         )}
                     </li>
                 ))}
