@@ -65,6 +65,7 @@ const ConfessionList = () => {
     
             const newReply = await response.json();
             
+            // Mettre à jour l'état local des confessions
             const updatedConfessions = confessions.map(confession => {
                 if (confession._id === confessionId) {
                     return updateReplies(confession, parentReplyId, newReply);
@@ -72,12 +73,12 @@ const ConfessionList = () => {
                 return confession;
             });
     
-            setConfessions(updatedConfessions);  // Mise à jour locale des confessions
+            setConfessions(updatedConfessions);  // Mise à jour locale
     
             // Forcer l'affichage des réponses après l'ajout
             setShowReplies(prev => ({
                 ...prev,
-                [confessionId]: true  // Assure que les réponses de cette confession soient visibles
+                [confessionId]: true  // Assurer que la section des réponses est visible
             }));
     
             setInputVisibility(prev => ({
@@ -92,7 +93,7 @@ const ConfessionList = () => {
         } catch (error) {
             setError(error.message);
         }
-    };      
+    };          
 
     const updateReplies = (confession, parentReplyId, newReply) => {
         const updatedReplies = confession.replies.map(reply => {
@@ -186,7 +187,7 @@ const ConfessionList = () => {
                     </a>
                 )}
     
-                {/* Affiche les réponses si elles sont visibles */}
+                {/* Assurer que les réponses sont visibles après l'ajout */}
                 {showReplies[confession._id] && renderReplies(confession.replies, confession._id)}
     
                 {/* Toujours afficher le lien "Répondre" pour répondre directement à la confession */}
@@ -218,7 +219,7 @@ const ConfessionList = () => {
                 )}
             </>
         );
-    };        
+    };            
 
     if (loading) return <p className="text-center text-gray-500">Chargement des confessions...</p>;
     if (error) return <p className="text-center text-red-500">{error}</p>;
