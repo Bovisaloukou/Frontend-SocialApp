@@ -5,7 +5,7 @@ const ConfessionList = () => {
     const [newConfession, setNewConfession] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [replyInputs, setReplyInputs] = useState({});
+    const [replyInputs, setReplyInputs] = useState({}); // Track which replies should show input
     const [showReplies, setShowReplies] = useState({});
     const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
@@ -73,10 +73,10 @@ const ConfessionList = () => {
 
             setConfessions(updatedConfessions);
 
-            // Après l'envoi, on cache l'input de réponse en réinitialisant la clé dans `replyInputs`
+            // Après l'envoi, on masque l'input de réponse en réinitialisant la clé dans `replyInputs`
             setReplyInputs(prev => ({
                 ...prev,
-                [parentReplyId || confessionId]: ''
+                [parentReplyId || confessionId]: false // Cache l'input après la soumission
             }));
 
         } catch (error) {
@@ -105,7 +105,7 @@ const ConfessionList = () => {
     const toggleReplyInput = (replyId) => {
         setReplyInputs(prev => ({
             ...prev,
-            [replyId]: prev[replyId] ? '' : '' // Initialise ou vide l'input au clic
+            [replyId]: !prev[replyId] // Affiche ou cache l'input de réponse
         }));
     };
 
@@ -146,7 +146,7 @@ const ConfessionList = () => {
                             <textarea
                                 placeholder="Répondre à cette réponse..."
                                 rows="2"
-                                value={replyInputs[reply._id]} // On relie à l'état
+                                value={replyInputs[reply._id]} // Liaison à l'état
                                 onChange={(e) => setReplyInputs(prev => ({ ...prev, [reply._id]: e.target.value }))}
                                 className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
                             />
@@ -171,7 +171,7 @@ const ConfessionList = () => {
                     <textarea
                         placeholder="Ajoutez le premier commentaire..."
                         rows="2"
-                        value={replyInputs[confession._id]} // On relie à l'état
+                        value={replyInputs[confession._id]} // Liaison à l'état
                         onChange={(e) => setReplyInputs(prev => ({ ...prev, [confession._id]: e.target.value }))}
                         className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
                     />
