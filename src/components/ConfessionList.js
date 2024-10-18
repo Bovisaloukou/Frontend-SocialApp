@@ -26,7 +26,7 @@ const ConfessionList = () => {
         fetchConfessions();
     }, []);
 
-    // Nouvelle confession
+    // Poster une nouvelle confession
     const handlePostConfession = async () => {
         if (!newConfession || newConfession.trim() === '') return;
 
@@ -41,13 +41,13 @@ const ConfessionList = () => {
 
             const data = await response.json();
             setConfessions([data, ...confessions]);
-            setNewConfession('');  // Clear input
+            setNewConfession('');  // Vider le champ après l'ajout
         } catch (err) {
             setError(err.message);
         }
     };
 
-    // Ajouter une réponse
+    // Ajouter une réponse à une confession
     const handleAddReply = async (confessionId, replyContent, parentReplyId = null) => {
         if (!replyContent || replyContent.trim() === '') return;
 
@@ -66,7 +66,7 @@ const ConfessionList = () => {
 
             const updatedConfession = await response.json();
             setConfessions(confessions.map(confession =>
-                confession._id === confessionId ? updatedConfession : confession
+                confession._id === confessionId ? { ...confession, replies: [...confession.replies, updatedConfession] } : confession
             ));
         } catch (error) {
             setError(error.message);
@@ -89,7 +89,7 @@ const ConfessionList = () => {
 
     const renderReplies = (replies = [], confessionId) => (
         <ul className="space-y-2 mt-2">
-            {replies.length > 0 ? replies.map((reply, index) => (
+            {replies.map((reply, index) => (
                 <li key={index} className="bg-gray-100 p-2 rounded-lg">
                     <p className="text-gray-700">{reply.content}</p>
                     <p className="text-sm text-gray-500"><em>{new Date(reply.createdAt).toLocaleString()}</em></p>
@@ -122,9 +122,7 @@ const ConfessionList = () => {
                         </div>
                     )}
                 </li>
-            )) : (
-                <p className="text-gray-500">Aucune réponse pour le moment, soyez le premier à commenter.</p>
-            )}
+            ))}
         </ul>
     );
 
