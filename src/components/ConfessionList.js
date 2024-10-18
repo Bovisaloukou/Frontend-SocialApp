@@ -180,10 +180,40 @@ const ConfessionList = () => {
                         {showReplies[confession._id] ? 'Masquer les réponses' : 'Voir les réponses'}
                     </a>
                 )}
+    
+                {/* Affiche les réponses si elles sont visibles */}
                 {showReplies[confession._id] && renderReplies(confession.replies, confession._id)}
+    
+                {/* Toujours afficher le lien "Répondre" pour répondre directement à la confession */}
+                <a
+                    href="#!"
+                    onClick={() => toggleReplyInput(confession._id)}
+                    className="text-sm text-blue-500 hover:underline mt-2 block"
+                >
+                    Répondre
+                </a>
+    
+                {/* Affiche l'input de réponse pour la confession */}
+                {inputVisibility[confession._id] && (
+                    <div>
+                        <textarea
+                            placeholder="Répondre à cette confession..."
+                            rows="2"
+                            value={replyInputs[confession._id] || ''} // Empty by default
+                            onChange={(e) => setReplyInputs(prev => ({ ...prev, [confession._id]: e.target.value }))}
+                            className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
+                        />
+                        <button
+                            onClick={() => handleAddReply(confession._id, replyInputs[confession._id])}
+                            className="mt-2 bg-blue-600 text-white py-1 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                        >
+                            Envoyer
+                        </button>
+                    </div>
+                )}
             </>
         );
-    };
+    };    
 
     if (loading) return <p className="text-center text-gray-500">Chargement des confessions...</p>;
     if (error) return <p className="text-center text-red-500">{error}</p>;
