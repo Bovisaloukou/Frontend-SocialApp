@@ -5,11 +5,11 @@ const ConfessionList = () => {
     const [newConfession, setNewConfession] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [replyInputs, setReplyInputs] = useState({}); // Pour gérer l'état des champs de réponse
-    const [showReplies, setShowReplies] = useState({}); // Pour gérer l'état de l'affichage des réponses
-
+    const [replyInputs, setReplyInputs] = useState({}); // Gère l'affichage des champs de réponse
+    const [showReplies, setShowReplies] = useState({}); // Gère l'affichage des réponses
     const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
+    // Récupère toutes les confessions au chargement du composant
     useEffect(() => {
         const fetchConfessions = async () => {
             setLoading(true);
@@ -29,6 +29,7 @@ const ConfessionList = () => {
         fetchConfessions();
     }, [BACKEND_URL]);
 
+    // Crée une nouvelle confession
     const handlePostConfession = async () => {
         if (newConfession.trim() === '') return;
 
@@ -51,6 +52,7 @@ const ConfessionList = () => {
         }
     };
 
+    // Ajoute une réponse à une confession ou à une sous-réponse
     const handleAddReply = async (confessionId, replyContent, parentReplyId = null) => {
         if (replyContent.trim() === '') return;
 
@@ -70,7 +72,6 @@ const ConfessionList = () => {
             }
 
             const updatedConfession = await response.json();
-
             // Mettre à jour la confession avec la nouvelle réponse
             setConfessions(confessions.map(confession =>
                 confession._id === confessionId ? updatedConfession : confession
@@ -80,6 +81,7 @@ const ConfessionList = () => {
         }
     };
 
+    // Active le champ de réponse pour une confession ou une réponse spécifique
     const toggleReplyInput = (confessionId) => {
         setReplyInputs(prev => ({
             ...prev,
@@ -87,13 +89,15 @@ const ConfessionList = () => {
         }));
     };
 
+    // Active l'affichage des réponses pour une confession
     const toggleShowReplies = (confessionId) => {
         setShowReplies(prev => ({
             ...prev,
-            [confessionId]: !prev[confessionId] // Toggle affichage des réponses
+            [confessionId]: !prev[confessionId] // Toggle l'affichage des réponses
         }));
     };
 
+    // Gère l'affichage des réponses et sous-réponses
     const renderReplies = (replies = [], confessionId) => {
         return (
             <ul className="space-y-2 mt-2">
@@ -103,7 +107,7 @@ const ConfessionList = () => {
                         <p className="text-sm text-gray-500">
                             <em>{new Date(reply.createdAt).toLocaleString()}</em>
                         </p>
-                        {/* Réponses aux réponses */}
+                        {/* Sous-réponses */}
                         {reply.replies?.length > 0 && (
                             <div className="ml-4">
                                 {renderReplies(reply.replies, confessionId)}
@@ -150,7 +154,6 @@ const ConfessionList = () => {
                     placeholder="Partagez votre confession..."
                     rows="3"
                     className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
-                    style={{ wordWrap: 'break-word' }} // Fixe le débordement du texte
                 />
                 <button
                     onClick={handlePostConfession}
@@ -179,7 +182,30 @@ const ConfessionList = () => {
                             <div className="mt-4 border-t pt-4">
                                 <h4 className="text-lg font-semibold text-gray-600">Réponses :</h4>
                                 {(!confession.replies || confession.replies.length === 0) ? (
-                                    <p className="text-gray-500">Aucune réponse pour le moment, soyez le premier à commenter.</p>
+                                    <>
+                                        <p className="text-gray-500">Aucune réponse pour le moment, soyez le premier à commenter.</p>
+                                        <a
+                                            href="#!"
+                                            onClick={() => toggleReplyInput(confession._id)}
+                                            className="text-sm text-blue-500 hover:underline mt-2 block"
+                                        >
+                                            Répondre
+                                        </a>
+                                        {replyInputs[confession._id] && (
+                                            <textarea
+                                                placeholder="Répondre à cette confession..."
+                                                rows="2"
+                                                onKeyDown={(e) => {
+                                                    if (e.key === 'Enter' && !e.shiftKey) {
+                                                        e.preventDefault();
+                                                        handleAddReply(confession._id, e.target.value);
+                                                        e.target.value = '';
+                                                    }
+                                                }}
+                                                className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
+                                            />
+                                        )}
+                                    </>
                                 ) : (
                                     renderReplies(confession.replies, confession._id)
                                 )}
