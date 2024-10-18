@@ -72,7 +72,14 @@ const ConfessionList = () => {
                 return confession;
             });
     
-            setConfessions(updatedConfessions);  // Mise à jour locale sans rafraîchir
+            setConfessions(updatedConfessions);  // Mise à jour locale des confessions
+    
+            // Forcer l'affichage des réponses après l'ajout
+            setShowReplies(prev => ({
+                ...prev,
+                [confessionId]: true  // Assure que les réponses de cette confession soient visibles
+            }));
+    
             setInputVisibility(prev => ({
                 ...prev,
                 [parentReplyId || confessionId]: false  // Masquer l'input après envoi
@@ -85,7 +92,7 @@ const ConfessionList = () => {
         } catch (error) {
             setError(error.message);
         }
-    };    
+    };      
 
     const updateReplies = (confession, parentReplyId, newReply) => {
         const updatedReplies = confession.replies.map(reply => {
@@ -197,7 +204,7 @@ const ConfessionList = () => {
                         <textarea
                             placeholder="Répondre à cette confession..."
                             rows="2"
-                            value={replyInputs[confession._id] || ''} // Empty by default
+                            value={replyInputs[confession._id] || ''}  // Empty by default
                             onChange={(e) => setReplyInputs(prev => ({ ...prev, [confession._id]: e.target.value }))}
                             className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
                         />
@@ -211,7 +218,7 @@ const ConfessionList = () => {
                 )}
             </>
         );
-    };    
+    };        
 
     if (loading) return <p className="text-center text-gray-500">Chargement des confessions...</p>;
     if (error) return <p className="text-center text-red-500">{error}</p>;
