@@ -73,6 +73,12 @@ const ConfessionList = () => {
 
             setConfessions(updatedConfessions);
 
+            // Après l'envoi, on cache l'input de réponse en réinitialisant la clé dans `replyInputs`
+            setReplyInputs(prev => ({
+                ...prev,
+                [parentReplyId || confessionId]: ''
+            }));
+
         } catch (error) {
             setError(error.message);
         }
@@ -99,7 +105,7 @@ const ConfessionList = () => {
     const toggleReplyInput = (replyId) => {
         setReplyInputs(prev => ({
             ...prev,
-            [replyId]: !prev[replyId]
+            [replyId]: prev[replyId] ? '' : '' // Initialise ou vide l'input au clic
         }));
     };
 
@@ -140,6 +146,7 @@ const ConfessionList = () => {
                             <textarea
                                 placeholder="Répondre à cette réponse..."
                                 rows="2"
+                                value={replyInputs[reply._id]} // On relie à l'état
                                 onChange={(e) => setReplyInputs(prev => ({ ...prev, [reply._id]: e.target.value }))}
                                 className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
                             />
@@ -164,6 +171,7 @@ const ConfessionList = () => {
                     <textarea
                         placeholder="Ajoutez le premier commentaire..."
                         rows="2"
+                        value={replyInputs[confession._id]} // On relie à l'état
                         onChange={(e) => setReplyInputs(prev => ({ ...prev, [confession._id]: e.target.value }))}
                         className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
                     />
