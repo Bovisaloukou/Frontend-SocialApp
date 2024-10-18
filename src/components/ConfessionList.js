@@ -5,8 +5,9 @@ const ConfessionList = () => {
     const [newConfession, setNewConfession] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [replyInputs, setReplyInputs] = useState({}); // Track which replies should show input
-    const [showReplies, setShowReplies] = useState({});
+    const [replyInputs, setReplyInputs] = useState({}); // Tracks input content per reply
+    const [showReplies, setShowReplies] = useState({}); // Tracks visibility of replies
+    const [inputVisibility, setInputVisibility] = useState({}); // Tracks input visibility for each confession or reply
     const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
     useEffect(() => {
@@ -73,10 +74,14 @@ const ConfessionList = () => {
 
             setConfessions(updatedConfessions);
 
-            // Après l'envoi, on masque l'input de réponse en réinitialisant la clé dans `replyInputs`
+            // After sending the reply, hide the input and reset the text
+            setInputVisibility(prev => ({
+                ...prev,
+                [parentReplyId || confessionId]: false // Hide input after submission
+            }));
             setReplyInputs(prev => ({
                 ...prev,
-                [parentReplyId || confessionId]: false // Cache l'input après la soumission
+                [parentReplyId || confessionId]: '' // Clear the input text
             }));
 
         } catch (error) {
@@ -103,16 +108,16 @@ const ConfessionList = () => {
     };
 
     const toggleReplyInput = (replyId) => {
-        setReplyInputs(prev => ({
+        setInputVisibility(prev => ({
             ...prev,
-            [replyId]: !prev[replyId] // Affiche ou cache l'input de réponse
+            [replyId]: !prev[replyId] // Toggle visibility of the input
         }));
     };
 
-    const toggleShowReplies = (replyId) => {
+    const toggleShowReplies = (confessionId) => {
         setShowReplies(prev => ({
             ...prev,
-            [replyId]: !prev[replyId]
+            [confessionId]: !prev[confessionId] // Toggle visibility of replies
         }));
     };
 
@@ -141,12 +146,12 @@ const ConfessionList = () => {
                     >
                         Répondre
                     </a>
-                    {replyInputs[reply._id] && (
+                    {inputVisibility[reply._id] && (
                         <div>
                             <textarea
                                 placeholder="Répondre à cette réponse..."
                                 rows="2"
-                                value={replyInputs[reply._id]} // Liaison à l'état
+                                value={replyInputs[reply._id] || ''} // Empty by default
                                 onChange={(e) => setReplyInputs(prev => ({ ...prev, [reply._id]: e.target.value }))}
                                 className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
                             />
@@ -164,27 +169,20 @@ const ConfessionList = () => {
     );
 
     const renderConfessionRepliesOrMessage = (confession) => {
-        if (!confession.replies || confession.replies.length === 0) {
-            return (
-                <div className="mt-4">
-                    <p className="text-gray-500">Aucun commentaire pour l'instant, soyez le premier à donner votre avis sur le sujet.</p>
-                    <textarea
-                        placeholder="Ajoutez le premier commentaire..."
-                        rows="2"
-                        value={replyInputs[confession._id]} // Liaison à l'état
-                        onChange={(e) => setReplyInputs(prev => ({ ...prev, [confession._id]: e.target.value }))}
-                        className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
-                    />
-                    <button
-                        onClick={() => handleAddReply(confession._id, replyInputs[confession._id])}
-                        className="mt-2 bg-blue-600 text-white py-1 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+        return (
+            <>
+                {confession.replies.length > 0 && (
+                    <a
+                        href="#!"
+                        onClick={() => toggleShowReplies(confession._id)}
+                        className="text-sm text-blue-500 hover:underline mt-2 block"
                     >
-                        Envoyer
-                    </button>
-                </div>
-            );
-        }
-        return renderReplies(confession.replies, confession._id);
+                        {showReplies[confession._id] ? 'Masquer les réponses' : 'Voir les réponses'}
+                    </a>
+                )}
+                {showReplies[confession._id] && renderReplies(confession.replies, confession._id)}
+            </>
+        );
     };
 
     if (loading) return <p className="text-center text-gray-500">Chargement des confessions...</p>;
