@@ -26,35 +26,44 @@ const ConfessionList = () => {
         fetchConfessions();
     }, []);
 
+    // Nouvelle confession
     const handlePostConfession = async () => {
-        if (newConfession.trim() === '') return;
+        if (!newConfession || newConfession.trim() === '') return;
+
         try {
             const response = await fetch(`${BACKEND_URL}/api/confessions`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ content: newConfession })
             });
+
             if (!response.ok) throw new Error('Erreur lors de la création de la confession.');
+
             const data = await response.json();
             setConfessions([data, ...confessions]);
-            setNewConfession('');
+            setNewConfession('');  // Clear input
         } catch (err) {
             setError(err.message);
         }
     };
 
+    // Ajouter une réponse
     const handleAddReply = async (confessionId, replyContent, parentReplyId = null) => {
-        if (replyContent.trim() === '') return;
+        if (!replyContent || replyContent.trim() === '') return;
+
         try {
             const endpoint = parentReplyId
                 ? `${BACKEND_URL}/api/confessions/${confessionId}/replies/${parentReplyId}`
                 : `${BACKEND_URL}/api/confessions/${confessionId}/replies`;
+
             const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ content: replyContent })
             });
+
             if (!response.ok) throw new Error('Erreur lors de la création de la réponse.');
+
             const updatedConfession = await response.json();
             setConfessions(confessions.map(confession =>
                 confession._id === confessionId ? updatedConfession : confession
@@ -80,7 +89,7 @@ const ConfessionList = () => {
 
     const renderReplies = (replies = [], confessionId) => (
         <ul className="space-y-2 mt-2">
-            {replies.map((reply, index) => (
+            {replies.length > 0 ? replies.map((reply, index) => (
                 <li key={index} className="bg-gray-100 p-2 rounded-lg">
                     <p className="text-gray-700">{reply.content}</p>
                     <p className="text-sm text-gray-500"><em>{new Date(reply.createdAt).toLocaleString()}</em></p>
@@ -101,10 +110,11 @@ const ConfessionList = () => {
                             <textarea
                                 placeholder="Répondre à cette réponse..."
                                 rows="2"
+                                onChange={(e) => setReplyInputs(prev => ({ ...prev, [reply._id]: e.target.value }))}
                                 className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
                             />
                             <button
-                                onClick={() => handleAddReply(confessionId, reply._id)}
+                                onClick={() => handleAddReply(confessionId, replyInputs[reply._id], reply._id)}
                                 className="mt-2 bg-blue-600 text-white py-1 px-4 rounded-lg hover:bg-blue-700 transition-colors"
                             >
                                 Envoyer
@@ -112,7 +122,9 @@ const ConfessionList = () => {
                         </div>
                     )}
                 </li>
-            ))}
+            )) : (
+                <p className="text-gray-500">Aucune réponse pour le moment, soyez le premier à commenter.</p>
+            )}
         </ul>
     );
 
@@ -153,24 +165,7 @@ const ConfessionList = () => {
                         {showReplies[confession._id] && (
                             <div className="mt-4 border-t pt-4">
                                 <h4 className="text-lg font-semibold text-gray-600">Réponses :</h4>
-                                {(!confession.replies || confession.replies.length === 0) ? (
-                                    <>
-                                        <p className="text-gray-500">Aucune réponse pour le moment, soyez le premier à commenter.</p>
-                                        <textarea
-                                            placeholder="Répondre à cette confession..."
-                                            rows="2"
-                                            className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
-                                        />
-                                        <button
-                                            onClick={() => handleAddReply(confession._id, replyInputs[confession._id])}
-                                            className="mt-2 bg-blue-600 text-white py-1 px-4 rounded-lg hover:bg-blue-700 transition-colors"
-                                        >
-                                            Envoyer
-                                        </button>
-                                    </>
-                                ) : (
-                                    renderReplies(confession.replies, confession._id)
-                                )}
+                                {renderReplies(confession.replies || [], confession._id)}
                             </div>
                         )}
                     </li>
