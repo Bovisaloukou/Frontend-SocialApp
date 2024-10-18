@@ -26,7 +26,6 @@ const ConfessionList = () => {
         fetchConfessions();
     }, []);
 
-    // Poster une nouvelle confession
     const handlePostConfession = async () => {
         if (!newConfession || newConfession.trim() === '') return;
 
@@ -41,13 +40,12 @@ const ConfessionList = () => {
 
             const data = await response.json();
             setConfessions([data, ...confessions]);
-            setNewConfession('');  // Vider le champ après l'ajout
+            setNewConfession('');
         } catch (err) {
             setError(err.message);
         }
     };
 
-    // Ajouter une réponse à une confession ou à une réponse
     const handleAddReply = async (confessionId, replyContent, parentReplyId = null) => {
         if (!replyContent || replyContent.trim() === '') return;
 
@@ -66,10 +64,8 @@ const ConfessionList = () => {
 
             const newReply = await response.json();
             
-            // Mettre à jour les confessions avec la nouvelle réponse
             const updatedConfessions = confessions.map(confession => {
                 if (confession._id === confessionId) {
-                    // Mettre à jour la confession avec la nouvelle réponse imbriquée
                     return updateReplies(confession, parentReplyId, newReply);
                 }
                 return confession;
@@ -82,7 +78,6 @@ const ConfessionList = () => {
         }
     };
 
-    // Fonction pour imbriquer les nouvelles réponses dans la structure des réponses existantes
     const updateReplies = (confession, parentReplyId, newReply) => {
         const updatedReplies = confession.replies.map(reply => {
             if (reply._id === parentReplyId) {
@@ -115,7 +110,6 @@ const ConfessionList = () => {
         }));
     };
 
-    // Récursivement afficher les réponses imbriquées
     const renderReplies = (replies = [], confessionId) => (
         <ul className="space-y-2 mt-2">
             {replies.map((reply, index) => (
@@ -162,6 +156,29 @@ const ConfessionList = () => {
         </ul>
     );
 
+    const renderConfessionRepliesOrMessage = (confession) => {
+        if (!confession.replies || confession.replies.length === 0) {
+            return (
+                <div className="mt-4">
+                    <p className="text-gray-500">Aucun commentaire pour l'instant, soyez le premier à donner votre avis sur le sujet.</p>
+                    <textarea
+                        placeholder="Ajoutez le premier commentaire..."
+                        rows="2"
+                        onChange={(e) => setReplyInputs(prev => ({ ...prev, [confession._id]: e.target.value }))}
+                        className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
+                    />
+                    <button
+                        onClick={() => handleAddReply(confession._id, replyInputs[confession._id])}
+                        className="mt-2 bg-blue-600 text-white py-1 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                        Envoyer
+                    </button>
+                </div>
+            );
+        }
+        return renderReplies(confession.replies, confession._id);
+    };
+
     if (loading) return <p className="text-center text-gray-500">Chargement des confessions...</p>;
     if (error) return <p className="text-center text-red-500">{error}</p>;
 
@@ -189,19 +206,7 @@ const ConfessionList = () => {
                 {confessions.map(confession => (
                     <li key={confession._id} className="bg-white p-6 shadow-lg rounded-lg border border-gray-200">
                         <p className="text-gray-800 mb-4" style={{ wordWrap: 'break-word' }}>{confession.content}</p>
-                        <a
-                            href="#!"
-                            onClick={() => toggleShowReplies(confession._id)}
-                            className="text-sm text-blue-500 hover:underline mt-4 block"
-                        >
-                            {showReplies[confession._id] ? 'Masquer les réponses' : 'Voir les réponses'}
-                        </a>
-                        {showReplies[confession._id] && (
-                            <div className="mt-4 border-t pt-4">
-                                <h4 className="text-lg font-semibold text-gray-600">Réponses :</h4>
-                                {renderReplies(confession.replies || [], confession._id)}
-                            </div>
-                        )}
+                        {renderConfessionRepliesOrMessage(confession)}
                     </li>
                 ))}
             </ul>
