@@ -55,10 +55,9 @@ const ConfessionList = () => {
         if (replyContent.trim() === '') return;
 
         try {
-            const backendUrl = process.env.REACT_APP_BACKEND_URL;
             const endpoint = parentReplyId
-                ? `${backendUrl}/api/confessions/${confessionId}/replies/${parentReplyId}` // Sous-réponse
-                : `${backendUrl}/api/confessions/${confessionId}/replies`; // Réponse normale
+                ? `${BACKEND_URL}/api/confessions/${confessionId}/replies/${parentReplyId}` // Sous-réponse
+                : `${BACKEND_URL}/api/confessions/${confessionId}/replies`;  // Réponse principale
 
             const response = await fetch(endpoint, {
                 method: 'POST',
@@ -71,6 +70,8 @@ const ConfessionList = () => {
             }
 
             const updatedConfession = await response.json();
+            
+            // Mettre à jour la confession avec la nouvelle réponse
             setConfessions(confessions.map(confession =>
                 confession._id === confessionId ? updatedConfession : confession
             ));
