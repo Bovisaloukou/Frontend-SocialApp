@@ -29,40 +29,40 @@ const ConfessionList = () => {
 
     const handlePostConfession = async () => {
         if (!newConfession || newConfession.trim() === '') return;
-
+    
         try {
             const response = await fetch(`${BACKEND_URL}/api/confessions`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ content: newConfession })
             });
-
+    
             if (!response.ok) throw new Error('Erreur lors de la création de la confession.');
-
+    
             const data = await response.json();
-            setConfessions([data, ...confessions]);
-            setNewConfession('');
+            setConfessions([data, ...confessions]);  // Mettre à jour l'état immédiatement
+            setNewConfession('');  // Réinitialiser le champ de saisie
         } catch (err) {
             setError(err.message);
         }
-    };
+    };    
 
     const handleAddReply = async (confessionId, replyContent, parentReplyId = null) => {
         if (!replyContent || replyContent.trim() === '') return;
-
+    
         try {
             const endpoint = parentReplyId
                 ? `${BACKEND_URL}/api/confessions/${confessionId}/replies/${parentReplyId}`
                 : `${BACKEND_URL}/api/confessions/${confessionId}/replies`;
-
+    
             const response = await fetch(endpoint, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
                 body: JSON.stringify({ content: replyContent })
             });
-
+    
             if (!response.ok) throw new Error('Erreur lors de la création de la réponse.');
-
+    
             const newReply = await response.json();
             
             const updatedConfessions = confessions.map(confession => {
@@ -71,23 +71,21 @@ const ConfessionList = () => {
                 }
                 return confession;
             });
-
-            setConfessions(updatedConfessions);
-
-            // After sending the reply, hide the input and reset the text
+    
+            setConfessions(updatedConfessions);  // Mise à jour locale sans rafraîchir
             setInputVisibility(prev => ({
                 ...prev,
-                [parentReplyId || confessionId]: false // Hide input after submission
+                [parentReplyId || confessionId]: false  // Masquer l'input après envoi
             }));
             setReplyInputs(prev => ({
                 ...prev,
-                [parentReplyId || confessionId]: '' // Clear the input text
+                [parentReplyId || confessionId]: ''  // Réinitialiser le champ de réponse
             }));
-
+    
         } catch (error) {
             setError(error.message);
         }
-    };
+    };    
 
     const updateReplies = (confession, parentReplyId, newReply) => {
         const updatedReplies = confession.replies.map(reply => {
