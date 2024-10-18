@@ -17,13 +17,13 @@ const ConfessionList = () => {
                 const response = await fetch(`${BACKEND_URL}/api/confessions`);
                 if (!response.ok) throw new Error('Erreur lors de la récupération des confessions.');
                 const data = await response.json();
-                setConfessions(data);
+                setConfessions(data);  // Met à jour les confessions avec les dernières données
             } catch (err) {
                 setError(err.message);
             } finally {
                 setLoading(false);
             }
-        };
+        };        
         fetchConfessions();
     }, []);
 
@@ -39,13 +39,12 @@ const ConfessionList = () => {
     
             if (!response.ok) throw new Error('Erreur lors de la création de la confession.');
     
-            const data = await response.json();
-            setConfessions([data, ...confessions]);  // Mettre à jour l'état immédiatement
-            setNewConfession('');  // Réinitialiser le champ de saisie
+            await fetchConfessions();  // Rafraîchir les confessions après l'ajout
+            setNewConfession('');  // Réinitialiser l'input
         } catch (err) {
             setError(err.message);
         }
-    };    
+    };        
 
     const handleAddReply = async (confessionId, replyContent, parentReplyId = null) => {
         if (!replyContent || replyContent.trim() === '') return;
@@ -63,27 +62,9 @@ const ConfessionList = () => {
     
             if (!response.ok) throw new Error('Erreur lors de la création de la réponse.');
     
-            const newReply = await response.json();
+            await fetchConfessions();  // Rafraîchir les confessions après l'ajout
     
-            // Mettre à jour les confessions localement
-            const updatedConfessions = confessions.map(confession => {
-                if (confession._id === confessionId) {
-                    return updateReplies(confession, parentReplyId, newReply);
-                }
-                return confession;
-            });
-    
-            setConfessions(updatedConfessions);
-    
-            // Forcer l'affichage des réponses si c'est la première réponse ajoutée à une confession
-            if (!showReplies[confessionId]) {
-                setShowReplies(prev => ({
-                    ...prev,
-                    [confessionId]: true  // Forcer l'ouverture des réponses
-                }));
-            }
-    
-            // Masquer le champ de réponse et le réinitialiser
+            // Masquer l'input et réinitialiser après envoi
             setInputVisibility(prev => ({
                 ...prev,
                 [parentReplyId || confessionId]: false
@@ -93,10 +74,16 @@ const ConfessionList = () => {
                 [parentReplyId || confessionId]: ''
             }));
     
+            // Forcer l'affichage des réponses après l'ajout
+            setShowReplies(prev => ({
+                ...prev,
+                [confessionId]: true  // Ouvre les réponses pour voir la nouvelle réponse
+            }));
+    
         } catch (error) {
             setError(error.message);
         }
-    };                  
+    };                      
 
     const updateReplies = (confession, parentReplyId, newReply) => {
         const updatedReplies = confession.replies.map(reply => {
