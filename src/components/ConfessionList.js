@@ -47,7 +47,7 @@ const ConfessionList = () => {
         }
     };
 
-    // Ajouter une réponse à une confession
+    // Ajouter une réponse à une confession ou à une réponse
     const handleAddReply = async (confessionId, replyContent, parentReplyId = null) => {
         if (!replyContent || replyContent.trim() === '') return;
 
@@ -64,29 +64,58 @@ const ConfessionList = () => {
 
             if (!response.ok) throw new Error('Erreur lors de la création de la réponse.');
 
-            const updatedConfession = await response.json();
-            setConfessions(confessions.map(confession =>
-                confession._id === confessionId ? { ...confession, replies: [...confession.replies, updatedConfession] } : confession
-            ));
+            const newReply = await response.json();
+            
+            // Mettre à jour les confessions avec la nouvelle réponse
+            const updatedConfessions = confessions.map(confession => {
+                if (confession._id === confessionId) {
+                    // Mettre à jour la confession avec la nouvelle réponse imbriquée
+                    return updateReplies(confession, parentReplyId, newReply);
+                }
+                return confession;
+            });
+
+            setConfessions(updatedConfessions);
+
         } catch (error) {
             setError(error.message);
         }
     };
 
-    const toggleReplyInput = (confessionId) => {
+    // Fonction pour imbriquer les nouvelles réponses dans la structure des réponses existantes
+    const updateReplies = (confession, parentReplyId, newReply) => {
+        const updatedReplies = confession.replies.map(reply => {
+            if (reply._id === parentReplyId) {
+                return {
+                    ...reply,
+                    replies: [...reply.replies, newReply]
+                };
+            } else if (reply.replies.length > 0) {
+                return {
+                    ...reply,
+                    replies: updateReplies({ replies: reply.replies }, parentReplyId, newReply).replies
+                };
+            }
+            return reply;
+        });
+        return { ...confession, replies: updatedReplies };
+    };
+
+    const toggleReplyInput = (replyId) => {
         setReplyInputs(prev => ({
             ...prev,
-            [confessionId]: !prev[confessionId]
+            [replyId]: !prev[replyId]
         }));
     };
 
-    const toggleShowReplies = (confessionId) => {
+    const toggleShowReplies = (replyId) => {
         setShowReplies(prev => ({
             ...prev,
-            [confessionId]: !prev[confessionId]
+            [replyId]: !prev[replyId]
         }));
     };
 
+    // Récursivement afficher les réponses imbriquées
     const renderReplies = (replies = [], confessionId) => (
         <ul className="space-y-2 mt-2">
             {replies.map((reply, index) => (
@@ -95,7 +124,14 @@ const ConfessionList = () => {
                     <p className="text-sm text-gray-500"><em>{new Date(reply.createdAt).toLocaleString()}</em></p>
                     {reply.replies?.length > 0 && (
                         <div className="ml-4">
-                            {renderReplies(reply.replies, confessionId)}
+                            <a
+                                href="#!"
+                                onClick={() => toggleShowReplies(reply._id)}
+                                className="text-sm text-blue-500 hover:underline mt-2 block"
+                            >
+                                {showReplies[reply._id] ? 'Masquer les réponses' : 'Voir les réponses'}
+                            </a>
+                            {showReplies[reply._id] && renderReplies(reply.replies, confessionId)}
                         </div>
                     )}
                     <a
