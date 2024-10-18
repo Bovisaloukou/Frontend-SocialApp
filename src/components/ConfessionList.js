@@ -114,10 +114,10 @@ const ConfessionList = () => {
         }));
     };
 
-    const renderReplies = (replies, confessionId, parentReplyId = null) => {
-        const limit = replyLimit[confessionId] || 2; // Limiter les réponses à 2 par défaut
-        const visibleReplies = replies.slice(0, limit); // Afficher seulement les réponses visibles
-
+    const renderReplies = (replies = [], confessionId, parentReplyId = null) => {
+        const limit = replyLimit[confessionId] || 2; 
+        const visibleReplies = replies.slice(0, limit); 
+    
         return (
             <ul className="space-y-2 mt-2">
                 {visibleReplies.map((reply, index) => (
@@ -126,15 +126,11 @@ const ConfessionList = () => {
                         <p className="text-sm text-gray-500">
                             <em>{new Date(reply.createdAt).toLocaleString()}</em>
                         </p>
-
-                        {/* Sous-réponses */}
                         {reply.replies?.length > 0 && (
                             <div className="ml-4">
                                 {renderReplies(reply.replies, confessionId, reply._id)}
                             </div>
                         )}
-
-                        {/* Lien pour répondre à cette réponse */}
                         <a
                             href="#!"
                             onClick={() => toggleReplyInput(reply._id)}
@@ -142,8 +138,6 @@ const ConfessionList = () => {
                         >
                             Répondre
                         </a>
-
-                        {/* Formulaire pour répondre à cette réponse */}
                         {replyInputs[reply._id] && (
                             <textarea
                                 placeholder="Répondre à cette réponse..."
@@ -152,7 +146,7 @@ const ConfessionList = () => {
                                     if (e.key === 'Enter' && !e.shiftKey) {
                                         e.preventDefault();
                                         handleAddReply(confessionId, e.target.value, reply._id);
-                                        e.target.value = ''; // Réinitialiser après l'envoi
+                                        e.target.value = '';
                                     }
                                 }}
                                 className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
@@ -160,12 +154,11 @@ const ConfessionList = () => {
                         )}
                     </li>
                 ))}
-                {/* Bouton "Voir plus" */}
                 {replies.length > limit && (
                     <button
                         onClick={() => setReplyLimit(prev => ({
                             ...prev,
-                            [confessionId]: limit + 5 // Augmenter de 5 à chaque clic
+                            [confessionId]: limit + 5
                         }))}
                         className="text-blue-500 hover:underline"
                     >
@@ -174,7 +167,7 @@ const ConfessionList = () => {
                 )}
             </ul>
         );
-    };
+    };    
 
     if (loading) return <p className="text-center text-gray-500">Chargement des confessions...</p>;
     if (error) return <p className="text-center text-red-500">{error}</p>;
