@@ -5,9 +5,8 @@ const ConfessionList = () => {
     const [newConfession, setNewConfession] = useState('');
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState(null);
-    const [replyInputs, setReplyInputs] = useState({}); // Pour stocker l'état d'affichage des réponses
-    const [showReplies, setShowReplies] = useState({}); // Pour stocker l'état de "voir les réponses"
-    const [replyLimit, setReplyLimit] = useState({}); // Limite d'affichage des réponses pour chaque confession
+    const [replyInputs, setReplyInputs] = useState({}); // Pour gérer l'état des champs de réponse
+    const [showReplies, setShowReplies] = useState({}); // Pour gérer l'état de l'affichage des réponses
     const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
     useEffect(() => {
@@ -70,7 +69,7 @@ const ConfessionList = () => {
             }
 
             const updatedConfession = await response.json();
-            
+
             // Mettre à jour la confession avec la nouvelle réponse
             setConfessions(confessions.map(confession =>
                 confession._id === confessionId ? updatedConfession : confession
@@ -80,31 +79,10 @@ const ConfessionList = () => {
         }
     };
 
-    const handleReaction = async (confessionId, emoji) => {
-        try {
-            const response = await fetch(`${BACKEND_URL}/api/confessions/${confessionId}/reactions`, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ emoji })
-            });
-
-            if (!response.ok) {
-                throw new Error('Erreur lors de l\'ajout de la réaction.');
-            }
-
-            const updatedConfession = await response.json();
-            setConfessions(confessions.map(confession =>
-                confession._id === confessionId ? updatedConfession : confession
-            ));
-        } catch (err) {
-            setError(err.message);
-        }
-    };
-
-    const toggleReplyInput = (replyId) => {
+    const toggleReplyInput = (confessionId) => {
         setReplyInputs(prev => ({
             ...prev,
-            [replyId]: !prev[replyId] // Toggle l'affichage de l'input
+            [confessionId]: !prev[confessionId] // Toggle l'affichage du champ de réponse
         }));
     };
 
@@ -115,21 +93,19 @@ const ConfessionList = () => {
         }));
     };
 
-    const renderReplies = (replies = [], confessionId, parentReplyId = null) => {
-        const limit = replyLimit[confessionId] || 2; 
-        const visibleReplies = replies.slice(0, limit); 
-    
+    const renderReplies = (replies = [], confessionId) => {
         return (
             <ul className="space-y-2 mt-2">
-                {visibleReplies.map((reply, index) => (
+                {replies.map((reply, index) => (
                     <li key={index} className="bg-gray-100 p-2 rounded-lg">
                         <p className="text-gray-700">{reply.content}</p>
                         <p className="text-sm text-gray-500">
                             <em>{new Date(reply.createdAt).toLocaleString()}</em>
                         </p>
+                        {/* Réponses aux réponses */}
                         {reply.replies?.length > 0 && (
                             <div className="ml-4">
-                                {renderReplies(reply.replies, confessionId, reply._id)}
+                                {renderReplies(reply.replies, confessionId)}
                             </div>
                         )}
                         <a
@@ -155,20 +131,9 @@ const ConfessionList = () => {
                         )}
                     </li>
                 ))}
-                {replies.length > limit && (
-                    <button
-                        onClick={() => setReplyLimit(prev => ({
-                            ...prev,
-                            [confessionId]: limit + 5
-                        }))}
-                        className="text-blue-500 hover:underline"
-                    >
-                        Voir plus
-                    </button>
-                )}
             </ul>
         );
-    };    
+    };
 
     if (loading) return <p className="text-center text-gray-500">Chargement des confessions...</p>;
     if (error) return <p className="text-center text-red-500">{error}</p>;
@@ -199,7 +164,7 @@ const ConfessionList = () => {
                     <li key={confession._id} className="bg-white p-6 shadow-lg rounded-lg border border-gray-200">
                         <p className="text-gray-800 mb-4" style={{ wordWrap: 'break-word' }}>{confession.content}</p>
 
-                        {/* Section des réactions avec plus d'émojis */}
+                        {/* Section des réactions */}
                         <div className="flex space-x-4 text-gray-500">
                             <button onClick={() => handleReaction(confession._id, '😂')} className="focus:outline-none">
                                 😂 {confession.reactions?.['😂'] || 0}
@@ -228,9 +193,23 @@ const ConfessionList = () => {
                         {showReplies[confession._id] && (
                             <div className="mt-4 border-t pt-4">
                                 <h4 className="text-lg font-semibold text-gray-600">Réponses :</h4>
-                                {!confession.replies || confession.replies.length === 0 ? (
-                                    <p className="text-gray-500">Aucune réponse pour le moment, soyez le premier à commenter.</p>
-                                    ) : (
+                                {(!confession.replies || confession.replies.length === 0) ? (
+                                    <>
+                                        <p className="text-gray-500">Aucune réponse pour le moment, soyez le premier à commenter.</p>
+                                        <textarea
+                                            placeholder="Répondre à cette confession..."
+                                            rows="2"
+                                            onKeyDown={(e) => {
+                                                if (e.key === 'Enter' && !e.shiftKey) {
+                                                    e.preventDefault();
+                                                    handleAddReply(confession._id, e.target.value);
+                                                    e.target.value = '';
+                                                }
+                                            }}
+                                            className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
+                                        />
+                                    </>
+                                ) : (
                                     renderReplies(confession.replies, confession._id)
                                 )}
                             </div>
