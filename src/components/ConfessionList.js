@@ -64,8 +64,8 @@ const ConfessionList = () => {
             if (!response.ok) throw new Error('Erreur lors de la création de la réponse.');
     
             const newReply = await response.json();
-            
-            // Mettre à jour l'état local des confessions avec la nouvelle réponse
+    
+            // Mettre à jour les confessions localement
             const updatedConfessions = confessions.map(confession => {
                 if (confession._id === confessionId) {
                     return updateReplies(confession, parentReplyId, newReply);
@@ -73,21 +73,21 @@ const ConfessionList = () => {
                 return confession;
             });
     
-            setConfessions(updatedConfessions);  // Mise à jour locale des confessions
+            setConfessions(updatedConfessions);
     
-            // Forcer l'affichage des réponses et du lien "Voir les réponses" après l'ajout
-            setShowReplies(prev => ({
-                ...prev,
-                [confessionId]: true  // Assurer que la section des réponses est visible
-            }));
+            // Forcer l'affichage des réponses si c'est la première réponse ajoutée à une confession
+            if (!showReplies[confessionId]) {
+                setShowReplies(prev => ({
+                    ...prev,
+                    [confessionId]: true  // Forcer l'ouverture des réponses
+                }));
+            }
     
-            // Masquer l'input de réponse après l'envoi
+            // Masquer le champ de réponse et le réinitialiser
             setInputVisibility(prev => ({
                 ...prev,
                 [parentReplyId || confessionId]: false
             }));
-    
-            // Réinitialiser le champ de réponse
             setReplyInputs(prev => ({
                 ...prev,
                 [parentReplyId || confessionId]: ''
@@ -96,7 +96,7 @@ const ConfessionList = () => {
         } catch (error) {
             setError(error.message);
         }
-    };              
+    };                  
 
     const updateReplies = (confession, parentReplyId, newReply) => {
         const updatedReplies = confession.replies.map(reply => {
@@ -180,8 +180,8 @@ const ConfessionList = () => {
     const renderConfessionRepliesOrMessage = (confession) => {
         return (
             <>
-                {/* Le lien "Voir les réponses" doit toujours apparaître si la confession a au moins une réponse */}
-                {confession.replies.length > 0 && (
+                {/* Le lien "Voir les réponses" doit apparaître si une réponse existe */}
+                {(confession.replies.length > 0 || showReplies[confession._id]) && (
                     <a
                         href="#!"
                         onClick={() => toggleShowReplies(confession._id)}
@@ -194,7 +194,7 @@ const ConfessionList = () => {
                 {/* Affiche les réponses si elles sont visibles */}
                 {showReplies[confession._id] && renderReplies(confession.replies, confession._id)}
     
-                {/* Toujours afficher le lien "Répondre" pour répondre directement à la confession */}
+                {/* Toujours afficher le lien "Répondre" */}
                 <a
                     href="#!"
                     onClick={() => toggleReplyInput(confession._id)}
@@ -203,13 +203,13 @@ const ConfessionList = () => {
                     Répondre
                 </a>
     
-                {/* Affiche l'input de réponse pour la confession */}
+                {/* Affiche l'input de réponse */}
                 {inputVisibility[confession._id] && (
                     <div>
                         <textarea
                             placeholder="Répondre à cette confession..."
                             rows="2"
-                            value={replyInputs[confession._id] || ''}  // Empty by default
+                            value={replyInputs[confession._id] || ''} 
                             onChange={(e) => setReplyInputs(prev => ({ ...prev, [confession._id]: e.target.value }))}
                             className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
                         />
@@ -223,7 +223,7 @@ const ConfessionList = () => {
                 )}
             </>
         );
-    };                
+    };                    
 
     if (loading) return <p className="text-center text-gray-500">Chargement des confessions...</p>;
     if (error) return <p className="text-center text-red-500">{error}</p>;
