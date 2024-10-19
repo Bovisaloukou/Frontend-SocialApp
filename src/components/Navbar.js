@@ -16,12 +16,12 @@ const Navbar = () => {
     <nav className="bg-blue-600 p-4">
       <div className="flex justify-between items-center">
         {/* Icône du menu hamburger */}
-        <div className="sm:hidden">
-          <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white focus:outline-none">
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
-            </svg>
-          </button>
+        <div className="sm:hidden w-full flex justify-end">
+            <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white focus:outline-none ml-auto">
+              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4 6h16M4 12h16M4 18h16"></path>
+              </svg>
+            </button>
         </div>
 
         {/* Liens de la navbar (affichés sur grand écran) */}
