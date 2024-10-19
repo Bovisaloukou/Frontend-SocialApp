@@ -10,6 +10,7 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    setError(''); // Reset error before making the request
   
     try {
       const backendUrl = process.env.REACT_APP_BACKEND_URL;
@@ -19,8 +20,9 @@ const Login = () => {
         body: JSON.stringify({ email, password })
       });
   
+      const data = await response.json();  // Assurez-vous que la réponse est au format JSON
+  
       if (response.ok) {
-        const data = await response.json();  // Assurez-vous que la réponse est au format JSON
         if (data.token) {
           localStorage.setItem('token', data.token);
           navigate('/events');
@@ -28,12 +30,14 @@ const Login = () => {
           setError(data.error || 'Erreur lors de la connexion');
         }
       } else {
-        setError('Erreur lors de la connexion : ' + error.message);
+        // Utilisation du message d'erreur provenant du backend
+        setError(data.error || 'Erreur lors de la connexion');
       }
     } catch (err) {
+      // Capture les erreurs réseau et affiche un message spécifique
       setError('Une erreur réseau s\'est produite, veuillez réessayer.');
     }
-  };
+  };  
   
 
   return (
