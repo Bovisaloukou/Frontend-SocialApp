@@ -8,6 +8,7 @@ const ConfessionList = () => {
     const [replyInputs, setReplyInputs] = useState({}); // Tracks input content per reply
     const [showReplies, setShowReplies] = useState({}); // Tracks visibility of replies
     const [inputVisibility, setInputVisibility] = useState({}); // Tracks input visibility for each confession or reply
+    const [posting, setPosting] = useState(false);  // Nouvel état pour le loader pendant l'envoi
     const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
     const fetchConfessions = async () => {
@@ -23,13 +24,15 @@ const ConfessionList = () => {
             setLoading(false);
         }
     };
-    
+
     useEffect(() => {        
         fetchConfessions();
     }, []);
 
     const handlePostConfession = async () => {
         if (!newConfession || newConfession.trim() === '') return;
+    
+        setPosting(true);  // Activer le loader
     
         try {
             const response = await fetch(`${BACKEND_URL}/api/confessions`, {
@@ -44,6 +47,8 @@ const ConfessionList = () => {
             setNewConfession('');  // Réinitialiser l'input
         } catch (err) {
             setError(err.message);
+        } finally {
+            setPosting(false);  // Désactiver le loader après l'envoi
         }
     };        
 
@@ -231,17 +236,19 @@ const ConfessionList = () => {
                 <button
                     onClick={handlePostConfession}
                     className="mt-2 w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
-                >
-                    Poster
+                    disabled={posting}  // Désactiver le bouton pendant l'envoi
+                    >
+                    {posting ? 'Envoi...' : 'Poster'}
                 </button>
             </div>
 
             <ul className="space-y-6">
                 {confessions.map(confession => (
-                    <li key={confession._id} className="bg-white p-6 shadow-lg rounded-lg border border-gray-200">
+                    <li key={confession._id} className="bg-white p-6 shadow-lg rounded-lg border border-gray-200 max-w-2xl mx-auto">
                         <p className="text-gray-800 mb-4" style={{ wordWrap: 'break-word' }}>{confession.content}</p>
                         {renderConfessionRepliesOrMessage(confession)}
                     </li>
+
                 ))}
             </ul>
         </div>
