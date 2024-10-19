@@ -25,7 +25,7 @@ const Navbar = () => {
         </div>
 
         {/* Liens de la navbar (affichés sur grand écran) */}
-        <div className="hidden sm:flex space-x-4 ml-auto">
+        <ul className="hidden sm:flex space-x-4 ml-auto list-none">
           {!token ? (
             <>
               <li>
@@ -51,7 +51,7 @@ const Navbar = () => {
               </li>
             </>
           )}
-        </div>
+        </ul>
 
       </div>
 
