@@ -25,7 +25,7 @@ const Navbar = () => {
         </div>
 
         {/* Liens de la navbar (affichés sur grand écran) */}
-        <ul className="hidden sm:flex space-x-4">
+        <div className="hidden sm:flex space-x-4 ml-auto">
           {!token ? (
             <>
               <li>
@@ -51,7 +51,8 @@ const Navbar = () => {
               </li>
             </>
           )}
-        </ul>
+        </div>
+
       </div>
 
       {/* Menu mobile (affiché seulement lorsque isMenuOpen est true) */}
