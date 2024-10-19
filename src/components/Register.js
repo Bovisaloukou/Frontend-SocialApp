@@ -35,7 +35,7 @@ const Register = () => {
       }
     } catch (error) {
       // Capture network errors and display them
-      setError('Échec de la requête : ' + error.message);
+      //setError('Échec de la requête : ' + error.message);
     }
   };  
 
