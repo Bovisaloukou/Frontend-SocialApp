@@ -21,23 +21,21 @@ const Register = () => {
         body: JSON.stringify({ name, email, password })
       });
   
-      if (!response.ok) {
-        // Capture HTTP errors
-        throw new Error('Erreur lors de la requête: ' + response.statusText);
-      }
-  
       const data = await response.json();
+  
+      if (!response.ok) {
+        // Utilise le message d'erreur du backend si disponible
+        throw new Error(data.error || 'Erreur lors de la requête');
+      }
   
       if (data.message === 'Utilisateur créé avec succès') {
         navigate('/login'); // Redirect to login on successful registration
-      } else {
-        setError(data.error || 'Erreur lors de l\'inscription');
       }
     } catch (error) {
-      // Capture network errors and display them
+      // Capture et affiche les messages d'erreur renvoyés par le backend
       setError('Échec de la requête : ' + error.message);
     }
-  };  
+  };    
 
   return (
     <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
