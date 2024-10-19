@@ -28,7 +28,7 @@ const Login = () => {
           setError(data.error || 'Erreur lors de la connexion');
         }
       } else {
-        setError('Erreur lors de la connexion : ' + response.status);
+        setError('Erreur lors de la connexion : ' + error.message);
       }
     } catch (err) {
       setError('Une erreur réseau s\'est produite, veuillez réessayer.');
