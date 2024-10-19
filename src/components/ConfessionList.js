@@ -10,20 +10,21 @@ const ConfessionList = () => {
     const [inputVisibility, setInputVisibility] = useState({}); // Tracks input visibility for each confession or reply
     const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
-    useEffect(() => {
-        const fetchConfessions = async () => {
-            setLoading(true);
-            try {
-                const response = await fetch(`${BACKEND_URL}/api/confessions`);
-                if (!response.ok) throw new Error('Erreur lors de la récupération des confessions.');
-                const data = await response.json();
-                setConfessions(data);  // Met à jour les confessions avec les dernières données
-            } catch (err) {
-                setError(err.message);
-            } finally {
-                setLoading(false);
-            }
-        };        
+    const fetchConfessions = async () => {
+        setLoading(true);
+        try {
+            const response = await fetch(`${BACKEND_URL}/api/confessions`);
+            if (!response.ok) throw new Error('Erreur lors de la récupération des confessions.');
+            const data = await response.json();
+            setConfessions(data);  // Met à jour les confessions avec les dernières données
+        } catch (err) {
+            setError(err.message);
+        } finally {
+            setLoading(false);
+        }
+    };
+    
+    useEffect(() => {        
         fetchConfessions();
     }, []);
 
