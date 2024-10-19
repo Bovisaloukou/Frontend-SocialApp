@@ -225,7 +225,7 @@ const ConfessionList = () => {
         <div className="container mx-auto mt-8 p-4">
             <h2 className="text-3xl font-bold text-center mb-6 text-blue-600">Confessions Anonymes</h2>
 
-            <div className="mb-6">
+            <div className="mb-6 max-w-2xl mx-auto">
                 <textarea
                     value={newConfession}
                     onChange={(e) => setNewConfession(e.target.value)}
