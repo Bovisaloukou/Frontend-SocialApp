@@ -1,3 +1,4 @@
+// Register.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -7,39 +8,42 @@ const Register = () => {
   const [password, setPassword] = useState('');
   const [matricule, setMatricule] = useState('');  
   const [error, setError] = useState('');
-  const [message, setMessage] = useState('');  // Pour afficher un message de confirmation
-  const [isLoading, setIsLoading] = useState(false);  // État pour gérer le chargement
-  const [readyToRedirect, setReadyToRedirect] = useState(false); // Nouvel état pour redirection manuelle
+  const [message, setMessage] = useState('');  // Message de confirmation
+  const [isLoading, setIsLoading] = useState(false);  // État de chargement
+  const [readyToRedirect, setReadyToRedirect] = useState(false); // Pour la redirection
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setMessage('');  // Réinitialiser les messages
-    setIsLoading(true);  // Démarre le chargement
+    setMessage('');  // Réinitialisation des messages
+    setIsLoading(true);  // Activation de l'état de chargement
 
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL;
+      const backendUrl = process.env.REACT_APP_BACKEND_URL;  // URL du backend depuis les variables d'environnement
       const response = await fetch(`${backendUrl}/users/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password, matricule })  // Inclure le matricule
+        body: JSON.stringify({ name, email, password, matricule })  // Données envoyées au backend
       });
 
       const data = await response.json();
 
       if (!response.ok) {
+        if (response.status === 401) {
+          throw new Error('Authentification échouée. Veuillez vérifier vos informations.');
+        }
         throw new Error(data.error || 'Erreur lors de la requête');
       }
 
-      // Si l'inscription est réussie, affiche un message de confirmation
+      // Si l'inscription est réussie, afficher un message de confirmation
       setMessage('Inscription réussie. Un email de vérification a été envoyé.');
       setIsLoading(false);
-      setReadyToRedirect(true);  // Activer la redirection manuelle
+      setReadyToRedirect(true);  // Redirection activée
 
     } catch (error) {
       setError('Échec de la requête : ' + error.message);
-      setIsLoading(false);  // Arrête le chargement
+      setIsLoading(false);  // Désactivation du chargement en cas d'erreur
     }
   };
 
@@ -92,7 +96,7 @@ const Register = () => {
       {message && <p className="text-green-500 mt-4">{message}</p>}
       {error && <p className="text-red-500 mt-4">{error}</p>}
 
-      {/* Bouton pour rediriger l'utilisateur après confirmation */}
+      {/* Redirection vers la page de connexion après succès */}
       {readyToRedirect && (
         <button
           className="mt-4 p-2 bg-green-600 text-white rounded"
