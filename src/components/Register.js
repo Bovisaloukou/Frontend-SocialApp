@@ -5,16 +5,18 @@ const Register = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [matricule, setMatricule] = useState('');  // Ajout du champ matricule
+  const [matricule, setMatricule] = useState('');  
   const [error, setError] = useState('');
-  const [isLoading, setIsLoading] = useState(false); // État pour gérer le chargement
+  const [message, setMessage] = useState('');  // Pour afficher un message de confirmation
+  const [isLoading, setIsLoading] = useState(false);  // État pour gérer le chargement
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setIsLoading(true); // Démarre le chargement
-    
+    setMessage('');  // Réinitialiser les messages
+    setIsLoading(true);  // Démarre le chargement
+
     try {
       const backendUrl = process.env.REACT_APP_BACKEND_URL;
       const response = await fetch(`${backendUrl}/users/register`, {
@@ -22,20 +24,25 @@ const Register = () => {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ name, email, password, matricule })  // Inclure le matricule
       });
-  
+
       const data = await response.json();
-  
+
       if (!response.ok) {
         throw new Error(data.error || 'Erreur lors de la requête');
       }
-  
-      if (data.message === 'Utilisateur créé avec succès') {
-        navigate('/login'); // Redirige vers la page de connexion en cas de succès
-      }
+
+      // Si l'inscription est réussie, affiche un message de confirmation
+      setMessage('Inscription réussie. Un email de vérification a été envoyé.');
+      setIsLoading(false);
+
+      // Redirection vers la page de connexion après 3 secondes
+      setTimeout(() => {
+        navigate('/login');
+      }, 3000);
+      
     } catch (error) {
       setError('Échec de la requête : ' + error.message);
-    } finally {
-      setIsLoading(false); // Arrête le chargement
+      setIsLoading(false);  // Arrête le chargement
     }
   };
 
@@ -63,7 +70,7 @@ const Register = () => {
           type="text"
           placeholder="Matricule"
           value={matricule}
-          onChange={(e) => setMatricule(e.target.value)}  // Gestion du champ matricule
+          onChange={(e) => setMatricule(e.target.value)}
           required
           className="w-full p-2 mb-4 border border-gray-300 rounded"
         />
@@ -78,11 +85,14 @@ const Register = () => {
         <button 
           type="submit" 
           className={`w-full p-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-          disabled={isLoading}  // Désactive le bouton pendant le chargement
+          disabled={isLoading}
         >
-          {isLoading ? 'Inscription en cours...' : "S'inscrire"}  {/* Change le texte pendant le chargement */}
+          {isLoading ? 'Inscription en cours...' : "S'inscrire"}
         </button>
       </form>
+      
+      {/* Message de confirmation ou d'erreur */}
+      {message && <p className="text-green-500 mt-4">{message}</p>}
       {error && <p className="text-red-500 mt-4">{error}</p>}
     </div>
   );
