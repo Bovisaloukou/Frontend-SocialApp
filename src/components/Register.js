@@ -9,6 +9,7 @@ const Register = () => {
   const [error, setError] = useState('');
   const [message, setMessage] = useState('');  // Pour afficher un message de confirmation
   const [isLoading, setIsLoading] = useState(false);  // État pour gérer le chargement
+  const [readyToRedirect, setReadyToRedirect] = useState(false); // Nouvel état pour redirection manuelle
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
@@ -34,12 +35,8 @@ const Register = () => {
       // Si l'inscription est réussie, affiche un message de confirmation
       setMessage('Inscription réussie. Un email de vérification a été envoyé.');
       setIsLoading(false);
+      setReadyToRedirect(true);  // Activer la redirection manuelle
 
-      // Redirection vers la page de connexion après 3 secondes
-      setTimeout(() => {
-        navigate('/login');
-      }, 3000);
-      
     } catch (error) {
       setError('Échec de la requête : ' + error.message);
       setIsLoading(false);  // Arrête le chargement
@@ -94,6 +91,16 @@ const Register = () => {
       {/* Message de confirmation ou d'erreur */}
       {message && <p className="text-green-500 mt-4">{message}</p>}
       {error && <p className="text-red-500 mt-4">{error}</p>}
+
+      {/* Bouton pour rediriger l'utilisateur après confirmation */}
+      {readyToRedirect && (
+        <button
+          className="mt-4 p-2 bg-green-600 text-white rounded"
+          onClick={() => navigate('/login')}
+        >
+          Aller à la page de connexion
+        </button>
+      )}
     </div>
   );
 };
