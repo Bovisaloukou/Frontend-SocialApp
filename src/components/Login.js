@@ -1,4 +1,3 @@
-// /src/components/Login.js
 import React, { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 
@@ -20,17 +19,19 @@ const Login = () => {
         body: JSON.stringify({ email, password })
       });
   
-      const data = await response.json();  // Assurez-vous que la réponse est au format JSON
+      const data = await response.json();  // S'assurer que la réponse est au format JSON
   
       if (response.ok) {
         if (data.token) {
+          // Stocker le token JWT dans localStorage et rediriger si tout est correct
           localStorage.setItem('token', data.token);
           navigate('/events');
         } else {
+          // Si pas de token mais la réponse est OK, afficher un message d'erreur
           setError(data.error || 'Erreur lors de la connexion');
         }
       } else {
-        // Utilisation du message d'erreur provenant du backend
+        // Capturer l'erreur si l'email n'est pas vérifié ou autre
         setError(data.error || 'Erreur lors de la connexion');
       }
     } catch (err) {
@@ -39,7 +40,6 @@ const Login = () => {
     }
   };  
   
-
   return (
     <div className="max-w-md mx-auto mt-10 p-4 bg-white shadow-md rounded-lg">
       <h2 className="text-2xl font-bold mb-6 text-center">Connexion</h2>
