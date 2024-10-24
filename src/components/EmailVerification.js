@@ -1,4 +1,5 @@
 // /components/EmailVerification.js
+
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -20,7 +21,7 @@ const EmailVerification = () => {
         const response = await fetch(`${process.env.REACT_APP_BACKEND_URL}/users/verify-email`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ token })
+          body: JSON.stringify({ token })  // Envoie le token au backend
         });
 
         const data = await response.json();
