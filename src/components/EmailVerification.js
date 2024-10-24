@@ -1,5 +1,3 @@
-// /components/EmailVerification.js
-
 import React, { useEffect, useState } from 'react';
 import { useNavigate, useLocation } from 'react-router-dom';
 
@@ -30,7 +28,9 @@ const EmailVerification = () => {
         }
 
         setMessage('Email vérifié avec succès. Vous allez être redirigé vers la page de connexion.');
-        setTimeout(() => navigate('/login'), 3000);  // Redirige après 3 secondes
+        
+        // Redirige immédiatement après succès (pas de délai)
+        navigate('/login');  
       } catch (err) {
         setError('Échec de la vérification de l\'email : ' + err.message);
       }
