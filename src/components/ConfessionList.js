@@ -260,9 +260,12 @@ const ConfessionList = () => {
                 {confessions.map(confession => (
                     <li key={confession._id} className="bg-white p-6 shadow-lg rounded-lg border border-gray-200 max-w-2xl mx-auto">
                         <p className="text-gray-800 mb-4" style={{ wordWrap: 'break-word' }}>{confession.content}</p>
+                        {/* Affiche l'image si elle est présente */}
+                        {confession.imageUrl && (
+                            <img src={confession.imageUrl} alt="Confession" className="mb-4 max-h-64 w-auto mx-auto rounded-lg" />
+                        )}
                         {renderConfessionRepliesOrMessage(confession)}
                     </li>
-
                 ))}
             </ul>
         </div>
