@@ -25,7 +25,7 @@ const Login = () => {
         if (data.token) {
           // Stocker le token JWT dans localStorage et rediriger si tout est correct
           localStorage.setItem('token', data.token);
-          navigate('/events');
+          navigate('/confessions');
         } else {
           // Si pas de token mais la réponse est OK, afficher un message d'erreur
           setError(data.error || 'Erreur lors de la connexion');
