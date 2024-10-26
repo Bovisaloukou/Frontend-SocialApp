@@ -4,6 +4,7 @@ const ConfessionList = () => {
     const [confessions, setConfessions] = useState([]);
     const [newConfession, setNewConfession] = useState('');
     const [loading, setLoading] = useState(false);
+    const [selectedImage, setSelectedImage] = useState(null);
     const [error, setError] = useState(null);
     const [replyInputs, setReplyInputs] = useState({}); // Tracks input content per reply
     const [showReplies, setShowReplies] = useState({}); // Tracks visibility of replies
@@ -33,18 +34,25 @@ const ConfessionList = () => {
         if (!newConfession || newConfession.trim() === '') return;
     
         setPosting(true);  // Activer le loader
+
+        // Préparer FormData pour inclure le contenu de la confession et l'image
+        const formData = new FormData();
+        formData.append('content', newConfession);
+        if (selectedImage) {
+            formData.append('image', selectedImage);
+        }
     
         try {
             const response = await fetch(`${BACKEND_URL}/api/confessions`, {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ content: newConfession })
+                body: formData,
             });
     
             if (!response.ok) throw new Error('Erreur lors de la création de la confession.');
     
             await fetchConfessions();  // Rafraîchir les confessions après l'ajout
             setNewConfession('');  // Réinitialiser l'input
+            setSelectedImage(null); // Réinitialiser l'image après le post
         } catch (err) {
             setError(err.message);
         } finally {
@@ -232,6 +240,12 @@ const ConfessionList = () => {
                     placeholder="Partagez votre confession..."
                     rows="3"
                     className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
+                />
+                <input
+                type="file"
+                accept="image/*"
+                onChange={(e) => setSelectedImage(e.target.files[0])}
+                className="mt-2"
                 />
                 <button
                     onClick={handlePostConfession}
