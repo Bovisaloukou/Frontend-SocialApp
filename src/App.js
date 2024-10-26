@@ -8,6 +8,7 @@ import EventsList from './components/EventsList';
 import CreateEvent from './components/CreateEvent';
 import EventQRCode from './components/EventQRCode';
 import ConfessionList from './components/ConfessionList'; // Import du composant ConfessionList
+import EmailVerification from './components/EmailVerification'; // Importez le composant EmailVerification
 
 function App() {
   return (
@@ -20,6 +21,7 @@ function App() {
         <Route path="/create-event" element={<CreateEvent />} />
         <Route path="/events/:id/qrcode" element={<EventQRCode />} />
         <Route path="/confessions" element={<ConfessionList />} /> {/* Nouvelle route pour ConfessionList */}
+        <Route path="/verify-email" element={<EmailVerification />} />
       </Routes>
     </Router>
   );
