@@ -260,7 +260,6 @@ const ConfessionList = () => {
                     rows="3"
                     className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
                 />
-                // Remplacer l'input de type "file" par un bouton stylé et l'aperçu de l'image
                 <div className="flex flex-col items-center">
                     <label 
                         htmlFor="image-upload" 
