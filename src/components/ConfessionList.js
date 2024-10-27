@@ -12,6 +12,14 @@ const ConfessionList = () => {
     const [posting, setPosting] = useState(false);  // Nouvel état pour le loader pendant l'envoi
     const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
 
+    // useEffect pour vérifier l'authentification
+    useEffect(() => {
+        const token = localStorage.getItem('token');
+        if (!token) {
+            navigate('/login');  // Redirection vers la page de connexion si aucun token n'est trouvé
+        }
+    }, [navigate]);
+ 
     const fetchConfessions = async () => {
         setLoading(true);
         try {
