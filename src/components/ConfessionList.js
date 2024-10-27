@@ -337,9 +337,9 @@ const ConfessionList = () => {
                     </li>
                 ))}
 
-                {loading && <p className="text-center text-gray-500">Chargement des confessions...</p>}
-                {error && <p className="text-center text-red-500">{error}</p>}
-                {!hasMore && <p className="text-center text-gray-500">Toutes les confessions sont chargées.</p>}
+            {loading && <p className="text-center text-gray-500">Chargement des confessions...</p>}
+            {error && <p className="text-center text-red-500">{error}</p>}
+            {!hasMore && !loading && <p className="text-center text-gray-500">Toutes les confessions sont chargées.</p>}
 
             </ul>
         </div>
