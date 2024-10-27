@@ -108,7 +108,15 @@ const ConfessionList = () => {
         } catch (error) {
             setError(error.message);
         }
-    };                      
+    };
+    
+    // Ajouter une fonction pour gérer l'aperçu de l'image
+    const handleImageChange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+            setSelectedImage(URL.createObjectURL(file)); // Crée une URL pour l'aperçu
+        }
+    };
 
     const updateReplies = (confession, parentReplyId, newReply) => {
         const updatedReplies = confession.replies.map(reply => {
@@ -252,12 +260,29 @@ const ConfessionList = () => {
                     rows="3"
                     className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
                 />
-                <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setSelectedImage(e.target.files[0])}
-                className="mt-2"
-                />
+                // Remplacer l'input de type "file" par un bouton stylé et l'aperçu de l'image
+                <div className="flex flex-col items-center">
+                    <label 
+                        htmlFor="image-upload" 
+                        className="cursor-pointer mt-2 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
+                    >
+                        Choisir une image
+                    </label>
+                    <input
+                        id="image-upload"
+                        type="file"
+                        accept="image/*"
+                        onChange={handleImageChange}
+                        className="hidden" // Cache l'input de type file
+                    />
+                    
+                    {/* Afficher un aperçu si une image est sélectionnée */}
+                    {selectedImage && (
+                        <div className="mt-4">
+                            <img src={selectedImage} alt="Aperçu de la confession" className="max-h-64 w-auto rounded-lg shadow-lg" />
+                        </div>
+                    )}
+                </div>
                 <button
                     onClick={handlePostConfession}
                     className="mt-2 w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors"
