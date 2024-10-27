@@ -281,7 +281,7 @@ const ConfessionList = () => {
                     {/* Afficher un aperçu si une image est sélectionnée */}
                     {selectedImage && (
                         <div className="mt-4">
-                            <img src={selectedImage} alt="Aperçu de la confession" className="max-h-64 w-auto rounded-lg shadow-lg" />
+                            <img src={selectedImage.preview} alt="Aperçu de la confession" className="max-h-64 w-auto rounded-lg shadow-lg" />
                         </div>
                     )}
                 </div>
