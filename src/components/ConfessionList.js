@@ -49,8 +49,8 @@ const ConfessionList = () => {
         // Préparer FormData pour inclure le contenu de la confession et l'image
         const formData = new FormData();
         formData.append('content', newConfession);
-        if (selectedImage) {
-            formData.append('image', selectedImage);
+        if (selectedImage && selectedImage.file) {
+            formData.append('image', selectedImage.file); // Envoie le fichier réel
         }
     
         try {
@@ -114,7 +114,10 @@ const ConfessionList = () => {
     const handleImageChange = (e) => {
         const file = e.target.files[0];
         if (file) {
-            setSelectedImage(URL.createObjectURL(file)); // Crée une URL pour l'aperçu
+            setSelectedImage({
+                file: file, // Fichier réel pour l'envoi
+                preview: URL.createObjectURL(file) // URL d’aperçu pour l'affichage
+            });
         }
     };
 
