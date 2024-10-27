@@ -13,6 +13,10 @@ const ConfessionList = () => {
     const [posting, setPosting] = useState(false);  // Nouvel état pour le loader pendant l'envoi
     const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
     const navigate = useNavigate();
+    const [page, setPage] = useState(1);
+    const limit = 10; // Nombre de confessions à charger par page
+    const [hasMore, setHasMore] = useState(true); // Indique s'il reste plus de confessions à charger
+
 
     // useEffect pour vérifier l'authentification
     useEffect(() => {
@@ -26,20 +30,39 @@ const ConfessionList = () => {
     const fetchConfessions = async () => {
         setLoading(true);
         try {
-            const response = await fetch(`${BACKEND_URL}/api/confessions`);
+            const response = await fetch(`${BACKEND_URL}/api/confessions?page=${page}&limit=${limit}`);
             if (!response.ok) throw new Error('Erreur lors de la récupération des confessions.');
             const data = await response.json();
-            setConfessions(data);  // Met à jour les confessions avec les dernières données
+    
+            // Met à jour les confessions avec les nouvelles données
+            setConfessions(prev => [...prev, ...data]);
+            
+            // Vérifie s'il reste des confessions à charger
+            if (data.length < limit) {
+                setHasMore(false); // Plus de données à charger
+            }
         } catch (err) {
             setError(err.message);
         } finally {
             setLoading(false);
         }
-    };
+    };    
+    
 
-    useEffect(() => {        
+    useEffect(() => {
         fetchConfessions();
-    }, []);
+    }, [page]);
+
+    useEffect(() => {
+        const handleScroll = () => {
+            if (window.innerHeight + document.documentElement.scrollTop + 1 >= document.documentElement.scrollHeight && hasMore) {
+                setPage(prevPage => prevPage + 1); // Charge la page suivante
+            }
+        };
+    
+        window.addEventListener('scroll', handleScroll);
+        return () => window.removeEventListener('scroll', handleScroll);
+    }, [hasMore]);
 
     const handlePostConfession = async () => {
         if (!newConfession || newConfession.trim() === '') return;
@@ -305,6 +328,11 @@ const ConfessionList = () => {
                         {renderConfessionRepliesOrMessage(confession)}
                     </li>
                 ))}
+
+                {loading && <p className="text-center text-gray-500">Chargement des confessions...</p>}
+                {error && <p className="text-center text-red-500">{error}</p>}
+                {!hasMore && <p className="text-center text-gray-500">Toutes les confessions sont chargées.</p>}
+
             </ul>
         </div>
     );
