@@ -15,6 +15,7 @@ const ConfessionList = () => {
     // useEffect pour vérifier l'authentification
     useEffect(() => {
         const token = localStorage.getItem('token');
+        console.log(token)
         if (!token) {
             navigate('/login');  // Redirection vers la page de connexion si aucun token n'est trouvé
         }
