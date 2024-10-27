@@ -1,6 +1,7 @@
 {
-  "short_name": "React App",
-  "name": "Create React App Sample",
+  "name": "Confessions Anonymes",
+  "short_name": "Confessions",
+  "description": "Partagez vos confessions de manière anonyme.",
   "icons": [
     {
       "src": "favicon.ico",
