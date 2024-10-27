@@ -28,6 +28,8 @@ const ConfessionList = () => {
     }, [navigate]);
  
     const fetchConfessions = async () => {
+        if (!hasMore) return; // Arrête de charger s'il n'y a plus de confessions
+
         setLoading(true);
         try {
             const response = await fetch(`${BACKEND_URL}/api/confessions?page=${page}&limit=${limit}`);
@@ -53,16 +55,22 @@ const ConfessionList = () => {
         fetchConfessions();
     }, [page]);
 
+    // Fonction de gestion du scroll pour détecter le bas de la page
+    const handleScroll = () => {
+        if (
+            window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 50 &&
+            !loading &&
+            hasMore
+        ) {
+            setPage(prevPage => prevPage + 1);
+        }
+    };
+
+    // Attache et détache l'événement scroll
     useEffect(() => {
-        const handleScroll = () => {
-            if (window.innerHeight + document.documentElement.scrollTop + 1 >= document.documentElement.scrollHeight && hasMore) {
-                setPage(prevPage => prevPage + 1); // Charge la page suivante
-            }
-        };
-    
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
-    }, [hasMore]);
+    }, [loading, hasMore]);
 
     const handlePostConfession = async () => {
         if (!newConfession || newConfession.trim() === '') return;
