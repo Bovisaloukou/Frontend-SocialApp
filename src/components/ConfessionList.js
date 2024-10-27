@@ -1,4 +1,5 @@
 import React, { useState, useEffect } from 'react';
+import { useNavigate } from 'react-router-dom';
 
 const ConfessionList = () => {
     const [confessions, setConfessions] = useState([]);
@@ -11,6 +12,7 @@ const ConfessionList = () => {
     const [inputVisibility, setInputVisibility] = useState({}); // Tracks input visibility for each confession or reply
     const [posting, setPosting] = useState(false);  // Nouvel état pour le loader pendant l'envoi
     const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+    const navigate = useNavigate();
 
     // useEffect pour vérifier l'authentification
     useEffect(() => {
