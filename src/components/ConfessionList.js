@@ -36,12 +36,14 @@ const ConfessionList = () => {
             const response = await fetch(`${BACKEND_URL}/api/confessions?page=${page}&limit=${limit}`);
             if (!response.ok) throw new Error('Erreur lors de la récupération des confessions.');
             const data = await response.json();
-            setConfessions(prev => [...prev, ...data]);
+
             const updatedLikedConfessions = {};
             data.forEach(confession => {
                 updatedLikedConfessions[confession._id] = confession.likedByCurrentUser; // Met à jour en fonction du backend
             });
             setLikedConfessions(prev => ({ ...prev, ...updatedLikedConfessions }));
+            setConfessions(prev => [...prev, ...data]);
+
             if (data.length < limit) setHasMore(false);
         } catch (err) {
             setError(err.message);
