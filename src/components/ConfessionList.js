@@ -37,6 +37,11 @@ const ConfessionList = () => {
             if (!response.ok) throw new Error('Erreur lors de la récupération des confessions.');
             const data = await response.json();
             setConfessions(prev => [...prev, ...data]);
+            const updatedLikedConfessions = {};
+            data.forEach(confession => {
+                updatedLikedConfessions[confession._id] = confession.likedByCurrentUser; // Met à jour en fonction du backend
+            });
+            setLikedConfessions(prev => ({ ...prev, ...updatedLikedConfessions }));
             if (data.length < limit) setHasMore(false);
         } catch (err) {
             setError(err.message);
@@ -255,7 +260,7 @@ const ConfessionList = () => {
                 },
                 credentials: 'include',  // Inclure les cookies si nécessaire
             });
-            
+
             if (!response.ok) throw new Error('Erreur lors de l\'ajout du like.');
     
             const { likes } = await response.json();
@@ -346,6 +351,7 @@ const ConfessionList = () => {
                             </button>
                             <span className="ml-2 text-gray-600">{confession.likes}</span> {/* Compteur de likes */}
                         </div>
+
                         {renderReplies(confession.replies, confession._id, true)}
                     </li>
                 ))}
