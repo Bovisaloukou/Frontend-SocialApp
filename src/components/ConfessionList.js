@@ -171,7 +171,7 @@ const ConfessionList = () => {
                             <a href="#!" onClick={() => toggleShowReplies(reply._id)} className="text-sm text-blue-500 hover:underline mt-2 block">
                                 {showReplies[reply._id] ? 'Masquer les réponses' : 'Voir les réponses'}
                             </a>
-                            {showReplies[reply._id] && renderReplies(reply.replies, confessionId)}
+                            {showReplies[reply._id] && renderReplies(reply.replies, confessionId, false)}
                         </div>
                     )}
                     
