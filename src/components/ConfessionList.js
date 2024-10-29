@@ -33,6 +33,7 @@ const ConfessionList = () => {
     
         setLoading(true);
         try {
+            const token = localStorage.getItem('token');
             const response = await fetch(`${BACKEND_URL}/api/confessions?page=${page}&limit=${limit}`, {
                     method: 'GET',
                     headers: {
