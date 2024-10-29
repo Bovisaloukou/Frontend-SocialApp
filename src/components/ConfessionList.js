@@ -104,39 +104,41 @@ const ConfessionList = () => {
     
             if (!response.ok) throw new Error('Erreur lors de la création de la réponse.');
     
-            const newReply = await response.json();  // Récupérer la réponse nouvellement créée
+            const newReply = await response.json();
     
             // Mise à jour de l'état des confessions pour inclure la nouvelle réponse
             setConfessions(prevConfessions => 
                 prevConfessions.map(confession => {
                     if (confession._id === confessionId) {
-                        // Si la réponse est de premier niveau, l'ajouter directement dans replies
                         if (!parentReplyId) {
+                            // Ajouter une réponse de premier niveau
                             return { ...confession, replies: [...confession.replies, newReply] };
                         } else {
-                            // Sinon, ajouter la sous-réponse dans la réponse parent
-                            const updatedReplies = confession.replies.map(reply => {
-                                if (reply._id === parentReplyId) {
-                                    return { ...reply, replies: [...(reply.replies || []), newReply] };
-                                }
-                                return reply;
-                            });
-                            return { ...confession, replies: updatedReplies };
+                            // Ajouter une sous-réponse de manière récursive
+                            const updateReplies = (replies) => {
+                                return replies.map(reply => {
+                                    if (reply._id === parentReplyId) {
+                                        return { ...reply, replies: [...(reply.replies || []), newReply] };
+                                    } else if (reply.replies) {
+                                        return { ...reply, replies: updateReplies(reply.replies) };
+                                    }
+                                    return reply;
+                                });
+                            };
+                            return { ...confession, replies: updateReplies(confession.replies) };
                         }
                     }
                     return confession;
                 })
             );
     
-            // Masquer l'input et réinitialiser le champ de saisie pour cette confession
             setInputVisibility(prev => ({ ...prev, [parentReplyId || confessionId]: false }));
             setReplyInputs(prev => ({ ...prev, [parentReplyId || confessionId]: '' }));
             setShowReplies(prev => ({ ...prev, [confessionId]: true }));
-    
         } catch (error) {
             setError(error.message);
         }
-    };    
+    };        
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
@@ -164,7 +166,7 @@ const ConfessionList = () => {
             {replies.map((reply, index) => (
                 <li key={index} className="bg-gray-100 p-2 rounded-lg shadow-md">
                     <p className="text-gray-700">{reply.content}</p>
-                    <p className="text-sm text-gray-500"><em>{new Date(reply.createdAt).toLocaleString()}</em></p>
+                    <p className="text-sm text-gray-500 text-left"><em>{new Date(reply.createdAt).toLocaleString()}</em></p>
                     
                     {reply.replies?.length > 0 && (
                         <div className="ml-4">
