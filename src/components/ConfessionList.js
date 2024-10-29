@@ -157,15 +157,21 @@ const ConfessionList = () => {
                                 onChange={(e) => setReplyInputs(prev => ({ ...prev, [reply._id]: e.target.value }))}
                                 className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
                             />
-                            <button onClick={() => handleAddReply(confessionId, replyInputs[reply._id], reply._id)} className="mt-2 bg-purple-600 text-white py-1 px-4 rounded-lg hover:bg-purple-700 transition-colors">
+                            <button onClick={() => handleAddReply(confessionId, replyInputs[reply._id], reply._id)} className="mt-2 bg-blue-600 text-white py-1 px-4 rounded-lg hover:bg-blue-700 transition-colors">
                                 Envoyer
                             </button>
                         </div>
                     )}
                 </li>
             ))}
+            {/* Afficher le lien "Répondre" même si replies est vide */}
+            {replies.length === 0 && (
+                <a href="#!" onClick={() => toggleReplyInput(confessionId)} className="text-sm text-blue-500 hover:underline mt-2 block">
+                    Répondre
+                </a>
+            )}
         </ul>
-    );
+    );    
 
     return (
         <div className="container mx-auto mt-8 p-4">
