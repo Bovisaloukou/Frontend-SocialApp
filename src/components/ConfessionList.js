@@ -166,67 +166,73 @@ const ConfessionList = () => {
     const renderReplies = (replies = [], confessionId, isRootLevel = false) => {
         // Limiter à trois réponses si c'est le niveau racine et showAllReplies est faux
         const visibleReplies = isRootLevel && !showAllReplies[confessionId] ? replies.slice(0, 3) : replies;
-        <ul className="space-y-2 mt-2">
-            {replies.map((reply, index) => (
-                <li key={index} className="bg-gray-100 p-2 rounded-lg shadow-md">
-                    <p className="text-gray-700">{reply.content}</p>
-                    <p className="text-sm text-gray-500 text-left"><em>{new Date(reply.createdAt).toLocaleString()}</em></p>
-                    
-                    {reply.replies?.length > 0 && (
-                        <div className="ml-4">
-                            <a href="#!" onClick={() => toggleShowReplies(reply._id)} className="text-sm text-blue-500 hover:underline mt-2 block">
-                                {showReplies[reply._id] ? 'Masquer les réponses' : 'Voir les réponses'}
-                            </a>
-                            {showReplies[reply._id] && renderReplies(reply.replies, confessionId, false)}
-                        </div>
-                    )}
-                    
-                    {/* Lien "Répondre" pour chaque niveau de réponse, mais uniquement pour ce niveau */}
-                    <a href="#!" onClick={() => toggleReplyInput(reply._id)} className="text-sm text-blue-500 hover:underline mt-2 block">
+        return (
+            <ul className="space-y-2 mt-2">
+                {visibleReplies.map((reply, index) => (
+                    <li key={index} className="bg-gray-100 p-2 rounded-lg shadow-md">
+                        <p className="text-gray-700">{reply.content}</p>
+                        <p className="text-sm text-gray-500 text-left"><em>{new Date(reply.createdAt).toLocaleString()}</em></p>
+                        
+                        {reply.replies?.length > 0 && (
+                            <div className="ml-4">
+                                <a href="#!" onClick={() => toggleShowReplies(reply._id)} className="text-sm text-blue-500 hover:underline mt-2 block">
+                                    {showReplies[reply._id] ? 'Masquer les réponses' : 'Voir les réponses'}
+                                </a>
+                                {showReplies[reply._id] && renderReplies(reply.replies, confessionId, false)}
+                            </div>
+                        )}
+                        
+                        <a href="#!" onClick={() => toggleReplyInput(reply._id)} className="text-sm text-blue-500 hover:underline mt-2 block">
+                            Répondre
+                        </a>
+                        
+                        {inputVisibility[reply._id] && (
+                            <div>
+                                <textarea
+                                    placeholder="Répondre à cette réponse..."
+                                    rows="2"
+                                    value={replyInputs[reply._id] || ''}
+                                    onChange={(e) => setReplyInputs(prev => ({ ...prev, [reply._id]: e.target.value }))}
+                                    className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
+                                />
+                                <button onClick={() => handleAddReply(confessionId, replyInputs[reply._id], reply._id)} className="mt-2 bg-blue-600 text-white py-1 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                                    Envoyer
+                                </button>
+                            </div>
+                        )}
+                    </li>
+                ))}
+    
+                {/* Afficher le lien "Voir plus" s'il y a plus de trois réponses et que toutes ne sont pas affichées */}
+                {isRootLevel && replies.length > 3 && !showAllReplies[confessionId] && (
+                    <a href="#!" onClick={() => setShowAllReplies(prev => ({ ...prev, [confessionId]: true }))} className="text-sm text-blue-500 hover:underline mt-2 block">
+                        Voir toutes les réponses
+                    </a>
+                )}
+    
+                {/* Lien "Répondre" de premier niveau */}
+                {isRootLevel && (
+                    <a href="#!" onClick={() => toggleReplyInput(confessionId)} className="text-sm text-blue-500 hover:underline mt-2 block">
                         Répondre
                     </a>
-                    
-                    {/* Champ de réponse pour les réponses imbriquées */}
-                    {inputVisibility[reply._id] && (
-                        <div>
-                            <textarea
-                                placeholder="Répondre à cette réponse..."
-                                rows="2"
-                                value={replyInputs[reply._id] || ''}
-                                onChange={(e) => setReplyInputs(prev => ({ ...prev, [reply._id]: e.target.value }))}
-                                className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
-                            />
-                            <button onClick={() => handleAddReply(confessionId, replyInputs[reply._id], reply._id)} className="mt-2 bg-blue-600 text-white py-1 px-4 rounded-lg hover:bg-blue-700 transition-colors">
-                                Envoyer
-                            </button>
-                        </div>
-                    )}
-                </li>
-            ))}
-            
-            {/* Lien "Répondre" de premier niveau (confession) uniquement s’il s’agit du niveau racine */}
-            {isRootLevel && (
-                <a href="#!" onClick={() => toggleReplyInput(confessionId)} className="text-sm text-blue-500 hover:underline mt-2 block">
-                    Répondre
-                </a>
-            )}
+                )}
     
-            {/* Champ de réponse pour la confession de premier niveau */}
-            {isRootLevel && inputVisibility[confessionId] && (
-                <div>
-                    <textarea
-                        placeholder="Répondre à cette confession..."
-                        rows="2"
-                        value={replyInputs[confessionId] || ''}
-                        onChange={(e) => setReplyInputs(prev => ({ ...prev, [confessionId]: e.target.value }))}
-                        className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
-                    />
-                    <button onClick={() => handleAddReply(confessionId, replyInputs[confessionId])} className="mt-2 bg-blue-600 text-white py-1 px-4 rounded-lg hover:bg-blue-700 transition-colors">
-                        Envoyer
-                    </button>
-                </div>
-            )}
-        </ul>
+                {isRootLevel && inputVisibility[confessionId] && (
+                    <div>
+                        <textarea
+                            placeholder="Répondre à cette confession..."
+                            rows="2"
+                            value={replyInputs[confessionId] || ''}
+                            onChange={(e) => setReplyInputs(prev => ({ ...prev, [confessionId]: e.target.value }))}
+                            className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
+                        />
+                        <button onClick={() => handleAddReply(confessionId, replyInputs[confessionId])} className="mt-2 bg-blue-600 text-white py-1 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                            Envoyer
+                        </button>
+                    </div>
+                )}
+            </ul>
+        );
     };                
 
     return (
@@ -263,71 +269,21 @@ const ConfessionList = () => {
                 </button>
             </div>
 
-            <ul className="space-y-2 mt-2">
-                {visibleReplies.map((reply, index) => (
-                    <li key={index} className="bg-gray-100 p-2 rounded-lg shadow-md">
-                        <p className="text-gray-700">{reply.content}</p>
-                        <p className="text-sm text-gray-500 text-left"><em>{new Date(reply.createdAt).toLocaleString()}</em></p>
-                        
-                        {reply.replies?.length > 0 && (
-                            <div className="ml-4">
-                                <a href="#!" onClick={() => toggleShowReplies(reply._id)} className="text-sm text-blue-500 hover:underline mt-2 block">
-                                    {showReplies[reply._id] ? 'Masquer les réponses' : 'Voir les réponses'}
-                                </a>
-                                {showReplies[reply._id] && renderReplies(reply.replies, confessionId, false)}
-                            </div>
+            <ul className="space-y-6">
+                {confessions.map(confession => (
+                    <li key={confession._id} className="bg-white p-6 shadow-lg rounded-lg border border-gray-200 max-w-2xl mx-auto">
+                        {/* Date de la confession alignée à droite */}
+                        <p className="text-sm text-gray-500 text-right"><em>{new Date(confession.createdAt).toLocaleString()}</em></p>
+                        <p className="text-gray-800 mb-4" style={{ wordWrap: 'break-word' }}>{confession.content}</p>
+                        {confession.imageUrl && (
+                            <img src={confession.imageUrl} alt="Confession" className="mb-4 max-h-64 w-auto mx-auto rounded-lg" />
                         )}
-                        
-                        <a href="#!" onClick={() => toggleReplyInput(reply._id)} className="text-sm text-blue-500 hover:underline mt-2 block">
-                            Répondre
-                        </a>
-                        
-                        {inputVisibility[reply._id] && (
-                            <div>
-                                <textarea
-                                    placeholder="Répondre à cette réponse..."
-                                    rows="2"
-                                    value={replyInputs[reply._id] || ''}
-                                    onChange={(e) => setReplyInputs(prev => ({ ...prev, [reply._id]: e.target.value }))}
-                                    className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
-                                />
-                                <button onClick={() => handleAddReply(confessionId, replyInputs[reply._id], reply._id)} className="mt-2 bg-blue-600 text-white py-1 px-4 rounded-lg hover:bg-blue-700 transition-colors">
-                                    Envoyer
-                                </button>
-                            </div>
-                        )}
+                        {renderReplies(confession.replies, confession._id, true)}
                     </li>
                 ))}
-
-                {/* Afficher le lien "Voir plus" s'il y a plus de trois réponses et que toutes ne sont pas affichées */}
-                {isRootLevel && replies.length > 3 && !showAllReplies[confessionId] && (
-                    <a href="#!" onClick={() => setShowAllReplies(prev => ({ ...prev, [confessionId]: true }))} className="text-sm text-blue-500 hover:underline mt-2 block">
-                        Voir toutes les réponses
-                    </a>
-                )}
-
-                {/* Lien "Répondre" de premier niveau */}
-                {isRootLevel && (
-                    <a href="#!" onClick={() => toggleReplyInput(confessionId)} className="text-sm text-blue-500 hover:underline mt-2 block">
-                        Répondre
-                    </a>
-                )}
-
-                {isRootLevel && inputVisibility[confessionId] && (
-                    <div>
-                        <textarea
-                            placeholder="Répondre à cette confession..."
-                            rows="2"
-                            value={replyInputs[confessionId] || ''}
-                            onChange={(e) => setReplyInputs(prev => ({ ...prev, [confessionId]: e.target.value }))}
-                            className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
-                        />
-                        <button onClick={() => handleAddReply(confessionId, replyInputs[confessionId])} className="mt-2 bg-blue-600 text-white py-1 px-4 rounded-lg hover:bg-blue-700 transition-colors">
-                            Envoyer
-                        </button>
-                    </div>
-                )}
-        </ul>
+                {loading && <p className="text-center text-gray-500">Chargement des confessions...</p>}
+                {!hasMore && !loading && <p className="text-center text-gray-500">Toutes les confessions sont chargées.</p>}
+            </ul>
         </div>
     );
 };
