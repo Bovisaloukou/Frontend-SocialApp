@@ -9,6 +9,8 @@ const ConfessionList = () => {
     const [error, setError] = useState(null);
     const [replyInputs, setReplyInputs] = useState({});
     const [showReplies, setShowReplies] = useState({});
+    // Ajouter un état pour gérer l'affichage des réponses de premier niveau supplémentaires
+    const [showAllReplies, setShowAllReplies] = useState({});
     const [inputVisibility, setInputVisibility] = useState({});
     const [posting, setPosting] = useState(false);
     const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
@@ -161,7 +163,9 @@ const ConfessionList = () => {
         setShowReplies(prev => ({ ...prev, [confessionId]: !prev[confessionId] }));
     };
 
-    const renderReplies = (replies = [], confessionId, isRootLevel = false) => (
+    const renderReplies = (replies = [], confessionId, isRootLevel = false) => {
+        // Limiter à trois réponses si c'est le niveau racine et showAllReplies est faux
+        const visibleReplies = isRootLevel && !showAllReplies[confessionId] ? replies.slice(0, 3) : replies;
         <ul className="space-y-2 mt-2">
             {replies.map((reply, index) => (
                 <li key={index} className="bg-gray-100 p-2 rounded-lg shadow-md">
@@ -223,7 +227,7 @@ const ConfessionList = () => {
                 </div>
             )}
         </ul>
-    );                
+    };                
 
     return (
         <div className="container mx-auto mt-8 p-4">
@@ -239,7 +243,7 @@ const ConfessionList = () => {
                 />
                 <div className="flex flex-col items-center">
                     <label htmlFor="image-upload" className="cursor-pointer mt-2 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
-                        Choisir une image
+                        Ajouter une image
                     </label>
                     <input
                         id="image-upload"
@@ -259,21 +263,71 @@ const ConfessionList = () => {
                 </button>
             </div>
 
-            <ul className="space-y-6">
-                {confessions.map(confession => (
-                    <li key={confession._id} className="bg-white p-6 shadow-lg rounded-lg border border-gray-200 max-w-2xl mx-auto">
-                        {/* Date de la confession alignée à droite */}
-                        <p className="text-sm text-gray-500 text-right"><em>{new Date(confession.createdAt).toLocaleString()}</em></p>
-                        <p className="text-gray-800 mb-4" style={{ wordWrap: 'break-word' }}>{confession.content}</p>
-                        {confession.imageUrl && (
-                            <img src={confession.imageUrl} alt="Confession" className="mb-4 max-h-64 w-auto mx-auto rounded-lg" />
+            <ul className="space-y-2 mt-2">
+                {visibleReplies.map((reply, index) => (
+                    <li key={index} className="bg-gray-100 p-2 rounded-lg shadow-md">
+                        <p className="text-gray-700">{reply.content}</p>
+                        <p className="text-sm text-gray-500 text-left"><em>{new Date(reply.createdAt).toLocaleString()}</em></p>
+                        
+                        {reply.replies?.length > 0 && (
+                            <div className="ml-4">
+                                <a href="#!" onClick={() => toggleShowReplies(reply._id)} className="text-sm text-blue-500 hover:underline mt-2 block">
+                                    {showReplies[reply._id] ? 'Masquer les réponses' : 'Voir les réponses'}
+                                </a>
+                                {showReplies[reply._id] && renderReplies(reply.replies, confessionId, false)}
+                            </div>
                         )}
-                        {renderReplies(confession.replies, confession._id, true)}
+                        
+                        <a href="#!" onClick={() => toggleReplyInput(reply._id)} className="text-sm text-blue-500 hover:underline mt-2 block">
+                            Répondre
+                        </a>
+                        
+                        {inputVisibility[reply._id] && (
+                            <div>
+                                <textarea
+                                    placeholder="Répondre à cette réponse..."
+                                    rows="2"
+                                    value={replyInputs[reply._id] || ''}
+                                    onChange={(e) => setReplyInputs(prev => ({ ...prev, [reply._id]: e.target.value }))}
+                                    className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
+                                />
+                                <button onClick={() => handleAddReply(confessionId, replyInputs[reply._id], reply._id)} className="mt-2 bg-blue-600 text-white py-1 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                                    Envoyer
+                                </button>
+                            </div>
+                        )}
                     </li>
                 ))}
-                {loading && <p className="text-center text-gray-500">Chargement des confessions...</p>}
-                {!hasMore && !loading && <p className="text-center text-gray-500">Toutes les confessions sont chargées.</p>}
-            </ul>
+
+                {/* Afficher le lien "Voir plus" s'il y a plus de trois réponses et que toutes ne sont pas affichées */}
+                {isRootLevel && replies.length > 3 && !showAllReplies[confessionId] && (
+                    <a href="#!" onClick={() => setShowAllReplies(prev => ({ ...prev, [confessionId]: true }))} className="text-sm text-blue-500 hover:underline mt-2 block">
+                        Voir toutes les réponses
+                    </a>
+                )}
+
+                {/* Lien "Répondre" de premier niveau */}
+                {isRootLevel && (
+                    <a href="#!" onClick={() => toggleReplyInput(confessionId)} className="text-sm text-blue-500 hover:underline mt-2 block">
+                        Répondre
+                    </a>
+                )}
+
+                {isRootLevel && inputVisibility[confessionId] && (
+                    <div>
+                        <textarea
+                            placeholder="Répondre à cette confession..."
+                            rows="2"
+                            value={replyInputs[confessionId] || ''}
+                            onChange={(e) => setReplyInputs(prev => ({ ...prev, [confessionId]: e.target.value }))}
+                            className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
+                        />
+                        <button onClick={() => handleAddReply(confessionId, replyInputs[confessionId])} className="mt-2 bg-blue-600 text-white py-1 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                            Envoyer
+                        </button>
+                    </div>
+                )}
+        </ul>
         </div>
     );
 };
