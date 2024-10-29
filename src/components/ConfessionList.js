@@ -181,7 +181,7 @@ const ConfessionList = () => {
                             </button>
                             <span className="ml-2 text-gray-600">{reply.likes}</span> {/* Compteur de likes */}
                         </div>
-                        
+
                         {reply.replies?.length > 0 && (
                             <div className="ml-4">
                                 <a href="#!" onClick={() => toggleShowReplies(reply._id)} className="text-sm text-blue-500 hover:underline mt-2 block">
@@ -246,10 +246,16 @@ const ConfessionList = () => {
     
     const handleLikeConfession = async (confessionId) => {
         try {
+            const token = localStorage.getItem('token'); // Récupérer le token JWT stocké
             const response = await fetch(`${BACKEND_URL}/api/confessions/${confessionId}/like`, {
                 method: 'PATCH',
-                credentials: 'include',  // Pour inclure les cookies si nécessaire
+                headers: {
+                    'Authorization': `Bearer ${token}`,  // Ajoutez le token dans l'en-tête Authorization
+                    'Content-Type': 'application/json',
+                },
+                credentials: 'include',  // Inclure les cookies si nécessaire
             });
+            
             if (!response.ok) throw new Error('Erreur lors de l\'ajout du like.');
     
             const { likes } = await response.json();
