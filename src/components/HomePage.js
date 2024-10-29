@@ -7,7 +7,7 @@ const HomePage = () => {
     return (
         <div className="max-w-4xl mx-auto px-4 py-10">
             {/* Logo animé en haut de la page */}
-            <div className="logo-container flex justify-center mb-10">
+            <div className="logo-container flex justify-center mb-5">
                 <img src={logo} alt="ESGIS Confessions Logo" className="logo w-32 h-32 animate-pulse-slow" />
             </div>
             
@@ -59,7 +59,7 @@ const HomePage = () => {
                     Prêt à tout lâcher ? Créez votre compte ou connectez-vous dès maintenant pour lire, partager et réagir aux confessions de vos camarades. Explorez cette communauté unique où chaque étudiant peut être lui-même, sans filtre ni masque.
                 </p>
                 <div className="space-x-4">
-                    <Link to="/signup" className="px-6 py-2 bg-blue-900 text-white rounded-lg hover:bg-red-500 transition-colors">
+                    <Link to="/register" className="px-6 py-2 bg-blue-900 text-white rounded-lg hover:bg-red-500 transition-colors">
                         Inscription
                     </Link>
                     <Link to="/login" className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-blue-900 transition-colors">
