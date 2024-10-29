@@ -33,7 +33,13 @@ const ConfessionList = () => {
     
         setLoading(true);
         try {
-            const response = await fetch(`${BACKEND_URL}/api/confessions?page=${page}&limit=${limit}`);
+            const response = await fetch(`${BACKEND_URL}/api/confessions?page=${page}&limit=${limit}`, {
+                    method: 'GET',
+                    headers: {
+                      'Authorization': `Bearer ${token}` // Remplacez token par votre jeton d'accès
+                    }
+            });
+
             if (!response.ok) throw new Error('Erreur lors de la récupération des confessions.');
             const data = await response.json();
 
