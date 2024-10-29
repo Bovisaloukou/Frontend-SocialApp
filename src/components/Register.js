@@ -6,25 +6,25 @@ const Register = () => {
   const [name, setName] = useState('');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
-  const [matricule, setMatricule] = useState('');  
+  const [matricule, setMatricule] = useState('');
   const [error, setError] = useState('');
-  const [message, setMessage] = useState('');  // Message de confirmation
-  const [isLoading, setIsLoading] = useState(false);  // État de chargement
-  const [readyToRedirect, setReadyToRedirect] = useState(false); // Pour la redirection
+  const [message, setMessage] = useState('');
+  const [isLoading, setIsLoading] = useState(false);
+  const [readyToRedirect, setReadyToRedirect] = useState(false);
   const navigate = useNavigate();
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     setError('');
-    setMessage('');  // Réinitialisation des messages
-    setIsLoading(true);  // Activation de l'état de chargement
+    setMessage('');
+    setIsLoading(true);
 
     try {
-      const backendUrl = process.env.REACT_APP_BACKEND_URL;  // URL du backend depuis les variables d'environnement
+      const backendUrl = process.env.REACT_APP_BACKEND_URL;
       const response = await fetch(`${backendUrl}/users/register`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ name, email, password, matricule })  // Données envoyées au backend
+        body: JSON.stringify({ name, email, password, matricule })
       });
 
       const data = await response.json();
@@ -36,28 +36,27 @@ const Register = () => {
         throw new Error(data.error || 'Erreur lors de la requête');
       }
 
-      // Si l'inscription est réussie, afficher un message de confirmation
       setMessage('Inscription réussie. Un email de vérification a été envoyé.');
       setIsLoading(false);
-      setReadyToRedirect(true);  // Redirection activée
+      setReadyToRedirect(true);
 
     } catch (error) {
       setError('Échec de la requête : ' + error.message);
-      setIsLoading(false);  // Désactivation du chargement en cas d'erreur
+      setIsLoading(false);
     }
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-md rounded-lg">
-      <h2 className="text-2xl font-bold mb-6 text-center">Inscription</h2>
-      <form onSubmit={handleSubmit}>
+    <div className="max-w-md mx-auto mt-10 p-6 bg-gray-100 shadow-lg rounded-lg">
+      <h2 className="text-2xl font-semibold mb-6 text-center text-gray-800">Inscription</h2>
+      <form onSubmit={handleSubmit} className="space-y-4">
         <input
           type="text"
           placeholder="Nom"
           value={name}
           onChange={(e) => setName(e.target.value)}
           required
-          className="w-full p-2 mb-4 border border-gray-300 rounded"
+          className="w-full p-3 bg-gray-50 border border-gray-300 rounded text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 transition"
         />
         <input
           type="email"
@@ -65,7 +64,7 @@ const Register = () => {
           value={email}
           onChange={(e) => setEmail(e.target.value)}
           required
-          className="w-full p-2 mb-4 border border-gray-300 rounded"
+          className="w-full p-3 bg-gray-50 border border-gray-300 rounded text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 transition"
         />
         <input
           type="text"
@@ -73,7 +72,7 @@ const Register = () => {
           value={matricule}
           onChange={(e) => setMatricule(e.target.value)}
           required
-          className="w-full p-2 mb-4 border border-gray-300 rounded"
+          className="w-full p-3 bg-gray-50 border border-gray-300 rounded text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 transition"
         />
         <input
           type="password"
@@ -81,25 +80,25 @@ const Register = () => {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           required
-          className="w-full p-2 mb-4 border border-gray-300 rounded"
+          className="w-full p-3 bg-gray-50 border border-gray-300 rounded text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 transition"
         />
-        <button 
-          type="submit" 
-          className={`w-full p-2 bg-blue-600 text-white rounded hover:bg-blue-700 transition-colors ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+        <button
+          type="submit"
+          className={`w-full p-3 rounded bg-[#B399D4] text-white hover:bg-[#A682C9] transition-colors ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
           disabled={isLoading}
         >
           {isLoading ? 'Inscription en cours...' : "S'inscrire"}
         </button>
       </form>
-      
+
       {/* Message de confirmation ou d'erreur */}
-      {message && <p className="text-green-500 mt-4">{message}</p>}
-      {error && <p className="text-red-500 mt-4">{error}</p>}
+      {message && <p className="text-center mt-4 text-[#B3CBB9]">{message}</p>}
+      {error && <p className="text-center mt-4 text-red-500">{error}</p>}
 
       {/* Redirection vers la page de connexion après succès */}
       {readyToRedirect && (
         <button
-          className="mt-4 p-2 bg-green-600 text-white rounded"
+          className="mt-4 w-full p-3 bg-[#B3CBB9] text-white rounded hover:bg-green-500 transition-colors"
           onClick={() => navigate('/login')}
         >
           Aller à la page de connexion

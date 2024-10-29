@@ -61,7 +61,7 @@ const Login = () => {
         />
         <button 
           type="submit" 
-          className={`w-full p-2 text-white rounded transition-colors ${isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-blue-600 hover:bg-blue-700'}`}
+          className={`w-full p-2 text-white rounded transition-colors ${isLoading ? 'bg-gray-400 cursor-not-allowed' : 'bg-purple-600 hover:bg-purple-700'}`}
           disabled={isLoading}  // Désactive le bouton si isLoading est vrai
         >
           {isLoading ? 'Connexion en cours...' : 'Se connecter'}

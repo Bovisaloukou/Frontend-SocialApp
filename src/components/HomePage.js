@@ -1,9 +1,15 @@
 import React from 'react';
 import { Link } from 'react-router-dom';
+import logo from '../assets/logo.svg'; // Assurez-vous d'avoir le logo dans ce dossier
 
 const HomePage = () => {
     return (
         <div className="max-w-4xl mx-auto px-4 py-10">
+            {/* Logo animé en haut de la page */}
+            <div className="logo-container">
+                <img src={logo} alt="ESGIS Confessions Logo" className="logo" />
+            </div>
+            
             <header className="text-center mb-10">
                 <h1 className="text-4xl font-bold text-blue-900">
                     Bienvenue sur <span className="text-red-500">ESGIS Confessions</span>
