@@ -195,7 +195,7 @@ const ConfessionList = () => {
                         
                         <div className="flex items-center">
                             <button onClick={() => handleLikeReply(reply._id)} className="text-blue-500 hover:text-blue-700">
-                                {likedReplies[reply._id] ? '💙' : '🤍'} {/* Icône de cœur */}
+                                {reply.likedByCurrentUser ? '💙' : '🤍'} {/* Icône de cœur */}
                             </button>
                             <span className="ml-2 text-gray-600">{reply.likes}</span> {/* Compteur de likes */}
                         </div>
@@ -291,34 +291,35 @@ const ConfessionList = () => {
     
     const handleLikeReply = async (replyId) => {
         try {
-            const token = localStorage.getItem('token'); // Récupérer le token JWT stocké
+            const token = localStorage.getItem('token');
             const response = await fetch(`${BACKEND_URL}/api/replies/${replyId}/like`, {
                 method: 'PATCH',
                 headers: {
-                    'Authorization': `Bearer ${token}`,  // Ajoutez le token dans l'en-tête Authorization
+                    'Authorization': `Bearer ${token}`,
                     'Content-Type': 'application/json',
                 },
                 credentials: 'include',
             });
+            
             if (!response.ok) throw new Error('Erreur lors de l\'ajout du like.');
     
-            const { likes } = await response.json();
+            const { likes, likedByCurrentUser } = await response.json(); // Assurez-vous que likedByCurrentUser est retourné par l'API
     
-            // Mettre à jour le nombre de likes et l'état de l'utilisateur pour la réponse
+            // Mettre à jour le nombre de likes et l'état likedByCurrentUser pour la réponse
             setConfessions(prevConfessions =>
                 prevConfessions.map(confession => ({
                     ...confession,
                     replies: confession.replies.map(reply =>
-                        reply._id === replyId ? { ...reply, likes } : reply
+                        reply._id === replyId ? { ...reply, likes, likedByCurrentUser } : reply
                     ),
                 }))
             );
-            setLikedReplies(prev => ({ ...prev, [replyId]: !prev[replyId] }));
+            
         } catch (error) {
             console.error(error);
             setError('Erreur lors de l\'ajout du like.');
         }
-    };    
+    };        
 
     return (
         <div className="container mx-auto mt-8 p-4">
