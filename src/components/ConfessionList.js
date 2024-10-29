@@ -164,7 +164,7 @@ const ConfessionList = () => {
             {replies.map((reply, index) => (
                 <li key={index} className="bg-gray-100 p-2 rounded-lg shadow-md">
                     <p className="text-gray-700">{reply.content}</p>
-                    <p className="text-sm text-gray-500 text-right"><em>{new Date(reply.createdAt).toLocaleString()}</em></p>
+                    <p className="text-sm text-gray-500"><em>{new Date(reply.createdAt).toLocaleString()}</em></p>
                     
                     {reply.replies?.length > 0 && (
                         <div className="ml-4">
