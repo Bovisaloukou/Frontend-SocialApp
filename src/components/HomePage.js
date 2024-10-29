@@ -53,20 +53,22 @@ const HomePage = () => {
                 </p>
             </section>
 
-            <section className="text-center mt-10">
-                <h2 className="text-2xl font-semibold text-blue-900 mb-4">Rejoignez WhisperHub et faites partie de l’aventure !</h2>
-                <p className="text-gray-700 mb-6">
-                    Prêt à tout révéler ? Créez votre compte ou connectez-vous pour explorer, partager et réagir aux confessions de vos camarades. Découvrez une communauté unique où chaque étudiant peut s’exprimer librement, sans filtre ni masque.
-                </p>
-                <div className="space-x-4">
-                    <Link to="/register" className="px-6 py-2 bg-blue-900 text-white rounded-lg hover:bg-red-500 transition-colors">
-                        Inscription
-                    </Link>
-                    <Link to="/login" className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-blue-900 transition-colors">
-                        Connexion
-                    </Link>
-                </div>
-            </section>
+            {!localStorage.getItem('token') && (
+                <section className="text-center mt-10">
+                    <h2 className="text-2xl font-semibold text-blue-900 mb-4">Rejoignez WhisperHub et faites partie de l’aventure !</h2>
+                    <p className="text-gray-700 mb-6">
+                        Prêt à tout révéler ? Créez votre compte ou connectez-vous pour explorer, partager et réagir aux confessions de vos camarades. Découvrez une communauté unique où chaque étudiant peut s’exprimer librement, sans filtre ni masque.
+                    </p>
+                    <div className="space-x-4">
+                        <Link to="/register" className="px-6 py-2 bg-blue-900 text-white rounded-lg hover:bg-red-500 transition-colors">
+                            Inscription
+                        </Link>
+                        <Link to="/login" className="px-6 py-2 bg-red-500 text-white rounded-lg hover:bg-blue-900 transition-colors">
+                            Connexion
+                        </Link>
+                    </div>
+                </section>
+            )}
         </div>
     );
 };

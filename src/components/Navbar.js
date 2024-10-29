@@ -44,12 +44,12 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <li>
+                {/* <li>
                   <Link to="/events" className="text-white hover:text-gray-300 transition-colors">Événements</Link>
                 </li>
                 <li>
                   <Link to="/create-event" className="text-white hover:text-gray-300 transition-colors">Créer un événement</Link>
-                </li>
+                </li> */}
                 <li>
                   <Link to="/confessions" className="text-white hover:text-gray-300 transition-colors">Confessions</Link>
                 </li>
@@ -75,12 +75,12 @@ const Navbar = () => {
               </>
             ) : (
               <>
-                <li>
+                {/*<li>
                   <Link to="/events" className="text-white hover:text-gray-300 transition-colors">Événements</Link>
                 </li>
                 <li>
                   <Link to="/create-event" className="text-white hover:text-gray-300 transition-colors">Créer un événement</Link>
-                </li>
+                </li> */}
                 <li>
                   <Link to="/confessions" className="text-white hover:text-gray-300 transition-colors">Confessions</Link>
                 </li>
