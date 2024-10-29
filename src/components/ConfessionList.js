@@ -190,8 +190,10 @@ const ConfessionList = () => {
             <ul className="space-y-2 mt-2">
                 {visibleReplies.map((reply, index) => (
                     <li key={index} className="bg-gray-100 p-2 rounded-lg shadow-md">
-                        <p className="text-gray-700">{reply.content}</p>
-                        <p className="text-sm text-gray-500 text-left"><em>{new Date(reply.createdAt).toLocaleString()}</em></p>
+                        <p className="text-gray-700">{reply.content || "Aucun message pour cette réponse."}</p>
+                        <p className="text-sm text-gray-500 text-left">
+                            <em>{reply.createdAt ? new Date(reply.createdAt).toLocaleString() : "Date inconnue"}</em>
+                        </p>
                         
                         <div className="flex items-center">
                             <button onClick={() => handleLikeReply(reply._id)} className="text-blue-500 hover:text-blue-700">
