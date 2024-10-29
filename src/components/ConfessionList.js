@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
+import jwt_decode from 'jwt-decode';
 
 const ConfessionList = () => {
     const [confessions, setConfessions] = useState([]);
@@ -28,6 +29,16 @@ const ConfessionList = () => {
         }
     }, [navigate]);
  
+    const getUserIdFromToken = () => {
+        const token = localStorage.getItem("token"); // Exemple : récupérer le token depuis le localStorage
+        if (!token) return null;
+        const decoded = jwt_decode(token);
+        console.log(decoded);
+        return decoded.userId;
+    };
+
+    getUserIdFromToken();
+
     const fetchConfessions = async () => {
         if (!hasMore) return;
     
