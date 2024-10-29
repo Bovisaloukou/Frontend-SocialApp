@@ -104,7 +104,31 @@ const ConfessionList = () => {
     
             if (!response.ok) throw new Error('Erreur lors de la création de la réponse.');
     
-            await fetchConfessions();
+            const newReply = await response.json();  // Récupérer la réponse nouvellement créée
+    
+            // Mise à jour de l'état des confessions pour inclure la nouvelle réponse
+            setConfessions(prevConfessions => 
+                prevConfessions.map(confession => {
+                    if (confession._id === confessionId) {
+                        // Si la réponse est de premier niveau, l'ajouter directement dans replies
+                        if (!parentReplyId) {
+                            return { ...confession, replies: [...confession.replies, newReply] };
+                        } else {
+                            // Sinon, ajouter la sous-réponse dans la réponse parent
+                            const updatedReplies = confession.replies.map(reply => {
+                                if (reply._id === parentReplyId) {
+                                    return { ...reply, replies: [...(reply.replies || []), newReply] };
+                                }
+                                return reply;
+                            });
+                            return { ...confession, replies: updatedReplies };
+                        }
+                    }
+                    return confession;
+                })
+            );
+    
+            // Masquer l'input et réinitialiser le champ de saisie pour cette confession
             setInputVisibility(prev => ({ ...prev, [parentReplyId || confessionId]: false }));
             setReplyInputs(prev => ({ ...prev, [parentReplyId || confessionId]: '' }));
             setShowReplies(prev => ({ ...prev, [confessionId]: true }));
@@ -112,7 +136,7 @@ const ConfessionList = () => {
         } catch (error) {
             setError(error.message);
         }
-    };
+    };    
 
     const handleImageChange = (e) => {
         const file = e.target.files[0];
