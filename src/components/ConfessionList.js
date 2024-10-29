@@ -307,13 +307,19 @@ const ConfessionList = () => {
     
             // Mettre à jour le nombre de likes et l'état likedByCurrentUser pour la réponse
             setConfessions(prevConfessions =>
-                prevConfessions.map(confession => ({
-                    ...confession,
-                    replies: confession.replies.map(reply =>
-                        reply._id === replyId ? { ...reply, likes, likedByCurrentUser } : reply
-                    ),
-                }))
-            );
+            prevConfessions.map(confession => ({
+                ...confession,
+                replies: confession.replies.map(reply => 
+                    reply._id === replyId 
+                        ? { 
+                            ...reply, 
+                            likes: reply.likedByCurrentUser ? reply.likes - 1 : reply.likes + 1, // Incrémenter ou décrémenter
+                            likedByCurrentUser: !reply.likedByCurrentUser // Inverser la valeur
+                        } 
+                        : reply
+                ),
+            }))
+        );
             
         } catch (error) {
             console.error(error);
