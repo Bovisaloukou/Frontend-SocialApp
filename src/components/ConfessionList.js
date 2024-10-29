@@ -74,8 +74,10 @@ const ConfessionList = () => {
     
             if (!response.ok) throw new Error('Erreur lors de la création de la confession.');
     
-            const newConfessionData = await response.json(); // Récupérer la confession nouvellement créée
-            setConfessions([newConfessionData, ...confessions]); // Ajouter la confession en haut de la liste
+            const newConfessionData = await response.json(); 
+            const confessionWithReplies = { ...newConfessionData, replies: [] }; // Ajoute un champ replies par défaut
+    
+            setConfessions([confessionWithReplies, ...confessions]); // Ajouter la confession en haut de la liste
             setNewConfession('');
             setSelectedImage(null);
         } catch (err) {
@@ -83,7 +85,7 @@ const ConfessionList = () => {
         } finally {
             setPosting(false);
         }
-    };    
+    };       
 
     const handleAddReply = async (confessionId, replyContent, parentReplyId = null) => {
         if (!replyContent || replyContent.trim() === '') return;
