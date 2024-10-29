@@ -30,7 +30,7 @@ const ConfessionList = () => {
  
     const fetchConfessions = async () => {
         if (!hasMore) return;
-
+    
         setLoading(true);
         try {
             const response = await fetch(`${BACKEND_URL}/api/confessions?page=${page}&limit=${limit}`);
@@ -38,21 +38,23 @@ const ConfessionList = () => {
             const data = await response.json();
 
             console.log(data);
-
+    
+            // Initialiser l'état des likes pour chaque confession
             const updatedLikedConfessions = {};
             data.forEach(confession => {
-                updatedLikedConfessions[confession._id] = confession.likedByCurrentUser; // Met à jour en fonction du backend
+                updatedLikedConfessions[confession._id] = confession.likedByCurrentUser || false;
             });
             setLikedConfessions(prev => ({ ...prev, ...updatedLikedConfessions }));
+    
             setConfessions(prev => [...prev, ...data]);
-
+    
             if (data.length < limit) setHasMore(false);
         } catch (err) {
             setError(err.message);
         } finally {
             setLoading(false);
         }
-    };    
+    };        
 
     useEffect(() => {
         fetchConfessions();
