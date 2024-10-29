@@ -202,13 +202,15 @@ const ConfessionList = () => {
                             <span className="ml-2 text-gray-600">{reply.likes}</span> {/* Compteur de likes */}
                         </div>
 
-                        {reply.replies?.length > 0 && (
+                        {reply.replies?.length > 0 ? (
                             <div className="ml-4">
                                 <a href="#!" onClick={() => toggleShowReplies(reply._id)} className="text-sm text-blue-500 hover:underline mt-2 block">
                                     {showReplies[reply._id] ? 'Masquer les réponses' : 'Voir les réponses'}
                                 </a>
-                                {showReplies[reply._id] && renderReplies(reply.replies, confessionId, false)}
+                                {showReplies[reply._id] && renderReplies(reply.replies || [], confessionId, false)}
                             </div>
+                        ) : (
+                            <p className="text-sm text-gray-500">Aucune sous-réponse pour le moment.</p>
                         )}
                         
                         <a href="#!" onClick={() => toggleReplyInput(reply._id)} className="text-sm text-blue-500 hover:underline mt-2 block">
