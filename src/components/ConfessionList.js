@@ -159,12 +159,13 @@ const ConfessionList = () => {
         setShowReplies(prev => ({ ...prev, [confessionId]: !prev[confessionId] }));
     };
 
-    const renderReplies = (replies = [], confessionId) => (
+    const renderReplies = (replies = [], confessionId, isRootLevel = false) => (
         <ul className="space-y-2 mt-2">
             {replies.map((reply, index) => (
                 <li key={index} className="bg-gray-100 p-2 rounded-lg shadow-md">
                     <p className="text-gray-700">{reply.content}</p>
-                    <p className="text-sm text-gray-500"><em>{new Date(reply.createdAt).toLocaleString()}</em></p>
+                    <p className="text-sm text-gray-500 text-right"><em>{new Date(reply.createdAt).toLocaleString()}</em></p>
+                    
                     {reply.replies?.length > 0 && (
                         <div className="ml-4">
                             <a href="#!" onClick={() => toggleShowReplies(reply._id)} className="text-sm text-blue-500 hover:underline mt-2 block">
@@ -173,9 +174,13 @@ const ConfessionList = () => {
                             {showReplies[reply._id] && renderReplies(reply.replies, confessionId)}
                         </div>
                     )}
+                    
+                    {/* Lien "Répondre" pour chaque niveau de réponse, mais uniquement pour ce niveau */}
                     <a href="#!" onClick={() => toggleReplyInput(reply._id)} className="text-sm text-blue-500 hover:underline mt-2 block">
                         Répondre
                     </a>
+                    
+                    {/* Champ de réponse pour les réponses imbriquées */}
                     {inputVisibility[reply._id] && (
                         <div>
                             <textarea
@@ -192,11 +197,16 @@ const ConfessionList = () => {
                     )}
                 </li>
             ))}
-            {/* Garder le lien "Répondre" visible pour la confession de premier niveau */}
-            <a href="#!" onClick={() => toggleReplyInput(confessionId)} className="text-sm text-blue-500 hover:underline mt-2 block">
-                Répondre
-            </a>
-            {inputVisibility[confessionId] && (
+            
+            {/* Lien "Répondre" de premier niveau (confession) uniquement s’il s’agit du niveau racine */}
+            {isRootLevel && (
+                <a href="#!" onClick={() => toggleReplyInput(confessionId)} className="text-sm text-blue-500 hover:underline mt-2 block">
+                    Répondre
+                </a>
+            )}
+    
+            {/* Champ de réponse pour la confession de premier niveau */}
+            {isRootLevel && inputVisibility[confessionId] && (
                 <div>
                     <textarea
                         placeholder="Répondre à cette confession..."
@@ -211,7 +221,7 @@ const ConfessionList = () => {
                 </div>
             )}
         </ul>
-    );            
+    );                
 
     return (
         <div className="container mx-auto mt-8 p-4">
@@ -250,7 +260,7 @@ const ConfessionList = () => {
             <ul className="space-y-6">
                 {confessions.map(confession => (
                     <li key={confession._id} className="bg-white p-6 shadow-lg rounded-lg border border-gray-200 max-w-2xl mx-auto">
-                        <p className="text-sm text-gray-500"><em>{new Date(confession.createdAt).toLocaleString()}</em></p>
+                        <p className="text-sm text-gray-500 text-right"><em>{new Date(reply.createdAt).toLocaleString()}</em></p>
                         <p className="text-gray-800 mb-4" style={{ wordWrap: 'break-word' }}>{confession.content}</p>
                         {confession.imageUrl && (
                             <img src={confession.imageUrl} alt="Confession" className="mb-4 max-h-64 w-auto mx-auto rounded-lg" />
