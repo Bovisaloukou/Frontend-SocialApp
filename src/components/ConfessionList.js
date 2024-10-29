@@ -293,6 +293,10 @@ const ConfessionList = () => {
         try {
             const response = await fetch(`${BACKEND_URL}/api/replies/${replyId}/like`, {
                 method: 'PATCH',
+                headers: {
+                    'Authorization': `Bearer ${token}`,  // Ajoutez le token dans l'en-tête Authorization
+                    'Content-Type': 'application/json',
+                },
                 credentials: 'include',
             });
             if (!response.ok) throw new Error('Erreur lors de l\'ajout du like.');
