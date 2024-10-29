@@ -291,6 +291,7 @@ const ConfessionList = () => {
     
     const handleLikeReply = async (replyId) => {
         try {
+            const token = localStorage.getItem('token'); // Récupérer le token JWT stocké
             const response = await fetch(`${BACKEND_URL}/api/replies/${replyId}/like`, {
                 method: 'PATCH',
                 headers: {
