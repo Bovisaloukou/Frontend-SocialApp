@@ -304,22 +304,31 @@ const ConfessionList = () => {
             if (!response.ok) throw new Error('Erreur lors de l\'ajout du like.');
     
             const { likes, likedByCurrentUser } = await response.json(); // Assurez-vous que likedByCurrentUser est retourné par l'API
-    
-            // Mettre à jour le nombre de likes et l'état likedByCurrentUser pour la réponse
-            setConfessions(prevConfessions =>
-            prevConfessions.map(confession => ({
-                ...confession,
-                replies: confession.replies.map(reply => 
-                    reply._id === replyId 
-                        ? { 
+
+            // Fonction récursive pour mettre à jour la réponse/sous-réponse ciblée
+            const updateReplies = (replies) => {
+                return replies.map(reply => {
+                    if (reply._id === replyId) {
+                        return { 
                             ...reply, 
-                            likes: reply.likedByCurrentUser ? reply.likes - 1 : reply.likes + 1, // Incrémenter ou décrémenter
-                            likedByCurrentUser: !reply.likedByCurrentUser // Inverser la valeur
-                        } 
-                        : reply
-                ),
-            }))
-        );
+                            likes: reply.likedByCurrentUser ? reply.likes - 1 : reply.likes + 1,
+                            likedByCurrentUser: !reply.likedByCurrentUser
+                        };
+                    }
+                    if (reply.replies?.length) {
+                        return { ...reply, replies: updateReplies(reply.replies) };
+                    }
+                    return reply;
+                });
+            };
+    
+            // Mise à jour de l'état des confessions avec les réponses et sous-réponses
+            setConfessions(prevConfessions =>
+                prevConfessions.map(confession => ({
+                    ...confession,
+                    replies: updateReplies(confession.replies),
+                }))
+            );
             
         } catch (error) {
             console.error(error);
