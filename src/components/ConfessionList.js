@@ -30,8 +30,6 @@ const ConfessionList = () => {
     }, [navigate]);
  
     const getUserIdFromToken = () => {
-        const token = localStorage.getItem("token"); // Exemple : récupérer le token depuis le localStorage
-        if (!token) return null;
         const decoded = jwt_decode(token);
         console.log(decoded);
         return decoded.userId;
