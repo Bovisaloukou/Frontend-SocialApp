@@ -176,7 +176,7 @@ const ConfessionList = () => {
                     <a href="#!" onClick={() => toggleReplyInput(reply._id)} className="text-sm text-blue-500 hover:underline mt-2 block">
                         Répondre
                     </a>
-                    {inputVisibility[reply._id] && (  // Afficher l'input si inputVisibility[reply._id] est vrai
+                    {inputVisibility[reply._id] && (
                         <div>
                             <textarea
                                 placeholder="Répondre à cette réponse..."
@@ -192,29 +192,26 @@ const ConfessionList = () => {
                     )}
                 </li>
             ))}
-            {replies.length === 0 && (
-                <>
-                    <a href="#!" onClick={() => toggleReplyInput(confessionId)} className="text-sm text-blue-500 hover:underline mt-2 block">
-                        Répondre
-                    </a>
-                    {inputVisibility[confessionId] && (
-                        <div>
-                            <textarea
-                                placeholder="Répondre à cette confession..."
-                                rows="2"
-                                value={replyInputs[confessionId] || ''}
-                                onChange={(e) => setReplyInputs(prev => ({ ...prev, [confessionId]: e.target.value }))}
-                                className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
-                            />
-                            <button onClick={() => handleAddReply(confessionId, replyInputs[confessionId])} className="mt-2 bg-blue-600 text-white py-1 px-4 rounded-lg hover:bg-blue-700 transition-colors">
-                                Envoyer
-                            </button>
-                        </div>
-                    )}
-                </>
+            {/* Garder le lien "Répondre" visible pour la confession de premier niveau */}
+            <a href="#!" onClick={() => toggleReplyInput(confessionId)} className="text-sm text-blue-500 hover:underline mt-2 block">
+                Répondre
+            </a>
+            {inputVisibility[confessionId] && (
+                <div>
+                    <textarea
+                        placeholder="Répondre à cette confession..."
+                        rows="2"
+                        value={replyInputs[confessionId] || ''}
+                        onChange={(e) => setReplyInputs(prev => ({ ...prev, [confessionId]: e.target.value }))}
+                        className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
+                    />
+                    <button onClick={() => handleAddReply(confessionId, replyInputs[confessionId])} className="mt-2 bg-blue-600 text-white py-1 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                        Envoyer
+                    </button>
+                </div>
             )}
         </ul>
-    );        
+    );            
 
     return (
         <div className="container mx-auto mt-8 p-4">
@@ -253,6 +250,7 @@ const ConfessionList = () => {
             <ul className="space-y-6">
                 {confessions.map(confession => (
                     <li key={confession._id} className="bg-white p-6 shadow-lg rounded-lg border border-gray-200 max-w-2xl mx-auto">
+                        <p className="text-sm text-gray-500"><em>{new Date(confession.createdAt).toLocaleString()}</em></p>
                         <p className="text-gray-800 mb-4" style={{ wordWrap: 'break-word' }}>{confession.content}</p>
                         {confession.imageUrl && (
                             <img src={confession.imageUrl} alt="Confession" className="mb-4 max-h-64 w-auto mx-auto rounded-lg" />
