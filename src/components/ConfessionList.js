@@ -1,19 +1,21 @@
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 
 const ConfessionList = () => {
     const [confessions, setConfessions] = useState([]);
     const [newConfession, setNewConfession] = useState('');
     const [loading, setLoading] = useState(false);
-    const [isFetchingMore, setIsFetchingMore] = useState(false);  // Nouveau : État de chargement pour le scroll infini
     const [selectedImage, setSelectedImage] = useState(null);
     const [error, setError] = useState(null);
+    const [replyInputs, setReplyInputs] = useState({});
+    const [showReplies, setShowReplies] = useState({});
+    const [inputVisibility, setInputVisibility] = useState({});
+    const [posting, setPosting] = useState(false);
+    const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
+    const navigate = useNavigate();
     const [page, setPage] = useState(1);
     const limit = 10;
     const [hasMore, setHasMore] = useState(true);
-    const loaderRef = useRef(null);  // Référence pour l'observation du bas de la page
-    const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
-    const navigate = useNavigate();
 
     useEffect(() => {
         const token = localStorage.getItem('token');
@@ -21,7 +23,7 @@ const ConfessionList = () => {
             navigate('/login');
         }
     }, [navigate]);
-
+ 
     const fetchConfessions = async () => {
         if (!hasMore) return;
 
@@ -30,43 +32,18 @@ const ConfessionList = () => {
             const response = await fetch(`${BACKEND_URL}/api/confessions?page=${page}&limit=${limit}`);
             if (!response.ok) throw new Error('Erreur lors de la récupération des confessions.');
             const data = await response.json();
-
             setConfessions(prev => [...prev, ...data]);
-            setHasMore(data.length === limit);  // Vérifie s'il reste des confessions à charger
+            if (data.length < limit) setHasMore(false);
         } catch (err) {
             setError(err.message);
         } finally {
             setLoading(false);
-            setIsFetchingMore(false);  // Fin du chargement pour le scroll infini
         }
-    };
+    };    
 
     useEffect(() => {
         fetchConfessions();
     }, [page]);
-
-    // Gestionnaire de l'observateur d'intersection pour charger plus de confessions
-    useEffect(() => {
-        const observer = new IntersectionObserver(
-            entries => {
-                if (entries[0].isIntersecting && hasMore && !isFetchingMore) {
-                    setIsFetchingMore(true);
-                    setPage(prevPage => prevPage + 1);  // Augmente le numéro de page pour charger plus de confessions
-                }
-            },
-            { threshold: 1.0 }
-        );
-
-        if (loaderRef.current) {
-            observer.observe(loaderRef.current);
-        }
-
-        return () => {
-            if (loaderRef.current) {
-                observer.unobserve(loaderRef.current);
-            }
-        };
-    }, [hasMore, isFetchingMore]);
 
     const handleScroll = () => {
         if (window.innerHeight + window.scrollY >= document.documentElement.scrollHeight - 50 && !loading && hasMore) {
@@ -216,8 +193,8 @@ const ConfessionList = () => {
                         </div>
                     )}
                 </div>
-                <button onClick={() => { /* handler code */ }} className="mt-2 w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors" disabled={loading}>
-                    {loading ? 'Envoi...' : 'Poster'}
+                <button onClick={handlePostConfession} className="mt-2 w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors" disabled={posting}>
+                    {posting ? 'Envoi...' : 'Poster'}
                 </button>
             </div>
 
@@ -231,18 +208,9 @@ const ConfessionList = () => {
                         {renderReplies(confession.replies, confession._id)}
                     </li>
                 ))}
+                {loading && <p className="text-center text-gray-500">Chargement des confessions...</p>}
+                {!hasMore && !loading && <p className="text-center text-gray-500">Toutes les confessions sont chargées.</p>}
             </ul>
-                {/* Loader en bas de page pour indiquer le chargement de plus de confessions */}
-            {isFetchingMore && (
-                <div className="flex justify-center mt-4" ref={loaderRef}>
-                    <div className="loader border-t-4 border-b-4 border-purple-500 w-8 h-8 rounded-full animate-spin"></div>
-                </div>
-            )}
-
-            {/* Message indiquant que toutes les confessions sont chargées */}
-            {!hasMore && !loading && (
-                <p className="text-center text-gray-500 mt-4">Toutes les confessions sont chargées.</p>
-            )}
         </div>
     );
 };
