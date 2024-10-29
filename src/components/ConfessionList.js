@@ -74,10 +74,11 @@ const ConfessionList = () => {
     
             if (!response.ok) throw new Error('Erreur lors de la création de la confession.');
     
-            const newConfessionData = await response.json(); 
-            const confessionWithReplies = { ...newConfessionData, replies: [] }; // Ajoute un champ replies par défaut
+            const newConfessionData = await response.json();
+            const confessionWithReplies = { ...newConfessionData, replies: [] };
     
-            setConfessions([confessionWithReplies, ...confessions]); // Ajouter la confession en haut de la liste
+            setConfessions([confessionWithReplies, ...confessions]);  // Ajouter la confession
+            setInputVisibility((prev) => ({ ...prev, [newConfessionData._id]: false }));  // Initialiser visibility
             setNewConfession('');
             setSelectedImage(null);
         } catch (err) {
@@ -85,7 +86,7 @@ const ConfessionList = () => {
         } finally {
             setPosting(false);
         }
-    };       
+    };           
 
     const handleAddReply = async (confessionId, replyContent, parentReplyId = null) => {
         if (!replyContent || replyContent.trim() === '') return;
@@ -123,9 +124,12 @@ const ConfessionList = () => {
         }
     };
 
-    const toggleReplyInput = (replyId) => {
-        setInputVisibility(prev => ({ ...prev, [replyId]: !prev[replyId] }));
-    };
+    const toggleReplyInput = (confessionId) => {
+        setInputVisibility((prev) => ({
+            ...prev,
+            [confessionId]: !prev[confessionId]  // Basculer l'état de visibilité
+        }));
+    };    
 
     const toggleShowReplies = (confessionId) => {
         setShowReplies(prev => ({ ...prev, [confessionId]: !prev[confessionId] }));
@@ -148,7 +152,7 @@ const ConfessionList = () => {
                     <a href="#!" onClick={() => toggleReplyInput(reply._id)} className="text-sm text-blue-500 hover:underline mt-2 block">
                         Répondre
                     </a>
-                    {inputVisibility[reply._id] && (
+                    {inputVisibility[reply._id] && (  // Afficher l'input si inputVisibility[reply._id] est vrai
                         <div>
                             <textarea
                                 placeholder="Répondre à cette réponse..."
@@ -164,14 +168,29 @@ const ConfessionList = () => {
                     )}
                 </li>
             ))}
-            {/* Afficher le lien "Répondre" même si replies est vide */}
             {replies.length === 0 && (
-                <a href="#!" onClick={() => toggleReplyInput(confessionId)} className="text-sm text-blue-500 hover:underline mt-2 block">
-                    Répondre
-                </a>
+                <>
+                    <a href="#!" onClick={() => toggleReplyInput(confessionId)} className="text-sm text-blue-500 hover:underline mt-2 block">
+                        Répondre
+                    </a>
+                    {inputVisibility[confessionId] && (
+                        <div>
+                            <textarea
+                                placeholder="Répondre à cette confession..."
+                                rows="2"
+                                value={replyInputs[confessionId] || ''}
+                                onChange={(e) => setReplyInputs(prev => ({ ...prev, [confessionId]: e.target.value }))}
+                                className="mt-2 w-full p-2 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
+                            />
+                            <button onClick={() => handleAddReply(confessionId, replyInputs[confessionId])} className="mt-2 bg-blue-600 text-white py-1 px-4 rounded-lg hover:bg-blue-700 transition-colors">
+                                Envoyer
+                            </button>
+                        </div>
+                    )}
+                </>
             )}
         </ul>
-    );    
+    );        
 
     return (
         <div className="container mx-auto mt-8 p-4">
