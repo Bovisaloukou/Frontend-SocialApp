@@ -1,8 +1,8 @@
-import React, { useState } from 'react';  // Ajout du useState pour gérer l'état du menu mobile
+import React, { useState } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 
 const Navbar = () => {
-  const [isMenuOpen, setIsMenuOpen] = useState(false);  // État pour contrôler l'ouverture du menu
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
   const token = localStorage.getItem('token');
   const navigate = useNavigate();
 
@@ -15,7 +15,14 @@ const Navbar = () => {
   return (
       <nav className="bg-blue-600 p-4 shadow-md">
         <div className="flex justify-between items-center">
-          {/* Icône du menu hamburger */}
+          {/* Nom du site qui renvoie à la page principale */}
+          <div className="flex items-center">
+            <Link to="/" className="text-white font-bold text-lg hover:text-gray-300">
+              WhisperHub
+            </Link>
+          </div>
+
+          {/* Icône du menu hamburger pour mobile */}
           <div className="sm:hidden w-full flex justify-end">
               <button onClick={() => setIsMenuOpen(!isMenuOpen)} className="text-white focus:outline-none ml-auto">
                 <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">

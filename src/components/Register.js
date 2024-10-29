@@ -47,7 +47,7 @@ const Register = () => {
   };
 
   return (
-    <div className="max-w-md mx-auto mt-10 p-6 bg-gray-100 shadow-lg rounded-lg">
+    <div className="max-w-md mx-auto mt-10 p-6 bg-white shadow-lg rounded-lg">
       <h2 className="text-2xl font-semibold mb-6 text-center text-gray-800">Inscription</h2>
       <form onSubmit={handleSubmit} className="space-y-4">
         <input
@@ -83,12 +83,13 @@ const Register = () => {
           className="w-full p-3 bg-gray-50 border border-gray-300 rounded text-gray-800 placeholder-gray-400 focus:outline-none focus:border-blue-400 transition"
         />
         <button
-          type="submit"
-          className={`w-full p-3 rounded bg-[#B399D4] text-white hover:bg-[#A682C9] transition-colors ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
-          disabled={isLoading}
+            type="submit"
+            className={`w-full p-3 rounded bg-[#4A90E2] text-white hover:bg-[#357ABD] transition-colors ${isLoading ? 'opacity-50 cursor-not-allowed' : ''}`}
+            disabled={isLoading}
         >
-          {isLoading ? 'Inscription en cours...' : "S'inscrire"}
+            {isLoading ? 'Inscription en cours...' : "S'inscrire"}
         </button>
+
       </form>
 
       {/* Message de confirmation ou d'erreur */}
