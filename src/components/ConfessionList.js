@@ -260,7 +260,8 @@ const ConfessionList = () => {
             <ul className="space-y-6">
                 {confessions.map(confession => (
                     <li key={confession._id} className="bg-white p-6 shadow-lg rounded-lg border border-gray-200 max-w-2xl mx-auto">
-                        <p className="text-sm text-gray-500 text-right"><em>{new Date(reply.createdAt).toLocaleString()}</em></p>
+                        {/* Date de la confession alignée à droite */}
+                        <p className="text-sm text-gray-500 text-right"><em>{new Date(confession.createdAt).toLocaleString()}</em></p>
                         <p className="text-gray-800 mb-4" style={{ wordWrap: 'break-word' }}>{confession.content}</p>
                         {confession.imageUrl && (
                             <img src={confession.imageUrl} alt="Confession" className="mb-4 max-h-64 w-auto mx-auto rounded-lg" />
