@@ -37,7 +37,9 @@ const ConfessionList = () => {
         return decoded.userId;
     };
 
-    getUserIdFromToken();
+    useEffect(() => {
+        getUserIdFromToken();
+    }, []);
 
     const fetchConfessions = async () => {
         if (!hasMore) return;
