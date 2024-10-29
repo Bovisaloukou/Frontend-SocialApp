@@ -27,16 +27,6 @@ const ConfessionList = () => {
             navigate('/login');
         }
     }, [navigate]);
- 
-    const getUserIdFromToken = () => {
-        const decoded = jwt_decode(token);
-        console.log(decoded);
-        return decoded.id;
-    };
-
-    useEffect(() => {
-        getUserIdFromToken();
-    }, []);
 
     const fetchConfessions = async () => {
         if (!hasMore) return;
