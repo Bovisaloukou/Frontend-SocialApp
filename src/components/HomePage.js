@@ -1,13 +1,14 @@
+// HomePage.js
 import React from 'react';
 import { Link } from 'react-router-dom';
-import logo from '../assets/logo.svg'; // Assurez-vous d'avoir le logo dans ce dossier
+import logo from '../assets/logo.svg';
 
 const HomePage = () => {
     return (
         <div className="max-w-4xl mx-auto px-4 py-10">
             {/* Logo animé en haut de la page */}
-            <div className="logo-container">
-                <img src={logo} alt="ESGIS Confessions Logo" className="logo" />
+            <div className="logo-container flex justify-center mb-10">
+                <img src={logo} alt="ESGIS Confessions Logo" className="logo w-32 h-32 animate-pulse-slow" />
             </div>
             
             <header className="text-center mb-10">
