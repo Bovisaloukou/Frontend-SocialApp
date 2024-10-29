@@ -74,7 +74,8 @@ const ConfessionList = () => {
     
             if (!response.ok) throw new Error('Erreur lors de la création de la confession.');
     
-            await fetchConfessions();
+            const newConfessionData = await response.json(); // Récupérer la confession nouvellement créée
+            setConfessions([newConfessionData, ...confessions]); // Ajouter la confession en haut de la liste
             setNewConfession('');
             setSelectedImage(null);
         } catch (err) {
@@ -82,7 +83,7 @@ const ConfessionList = () => {
         } finally {
             setPosting(false);
         }
-    };
+    };    
 
     const handleAddReply = async (confessionId, replyContent, parentReplyId = null) => {
         if (!replyContent || replyContent.trim() === '') return;
@@ -177,7 +178,7 @@ const ConfessionList = () => {
                     className="w-full p-3 border border-gray-300 rounded-lg focus:outline-none focus:border-blue-500 resize-none"
                 />
                 <div className="flex flex-col items-center">
-                    <label htmlFor="image-upload" className="cursor-pointer mt-2 bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors">
+                    <label htmlFor="image-upload" className="cursor-pointer mt-2 bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors">
                         Choisir une image
                     </label>
                     <input
@@ -193,7 +194,7 @@ const ConfessionList = () => {
                         </div>
                     )}
                 </div>
-                <button onClick={handlePostConfession} className="mt-2 w-full bg-purple-600 text-white py-2 px-4 rounded-lg hover:bg-purple-700 transition-colors" disabled={posting}>
+                <button onClick={handlePostConfession} className="mt-2 w-full bg-blue-600 text-white py-2 px-4 rounded-lg hover:bg-blue-700 transition-colors" disabled={posting}>
                     {posting ? 'Envoi...' : 'Poster'}
                 </button>
             </div>
