@@ -32,7 +32,7 @@ const ConfessionList = () => {
     const getUserIdFromToken = () => {
         const decoded = jwt_decode(token);
         console.log(decoded);
-        return decoded.userId;
+        return decoded.id;
     };
 
     useEffect(() => {
