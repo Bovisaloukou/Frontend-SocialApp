@@ -7,7 +7,7 @@ const HomePage = () => {
     return (
         <div className="max-w-4xl mx-auto px-4 py-10">
             {/* Logo animé en haut de la page */}
-            <div className="logo-container flex justify-center mb-5">
+            <div className="logo-container flex justify-center mb-2">
                 <img src={logo} alt="ESGIS Confessions Logo" className="logo w-32 h-32 animate-pulse-slow" />
             </div>
             

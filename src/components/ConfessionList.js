@@ -12,6 +12,8 @@ const ConfessionList = () => {
     // Ajouter un état pour gérer l'affichage des réponses de premier niveau supplémentaires
     const [showAllReplies, setShowAllReplies] = useState({});
     const [inputVisibility, setInputVisibility] = useState({});
+    const [likedConfessions, setLikedConfessions] = useState({});
+    const [likedReplies, setLikedReplies] = useState({});
     const [posting, setPosting] = useState(false);
     const BACKEND_URL = process.env.REACT_APP_BACKEND_URL || 'http://localhost:5000';
     const navigate = useNavigate();
@@ -173,6 +175,13 @@ const ConfessionList = () => {
                         <p className="text-gray-700">{reply.content}</p>
                         <p className="text-sm text-gray-500 text-left"><em>{new Date(reply.createdAt).toLocaleString()}</em></p>
                         
+                        <div className="flex items-center">
+                            <button onClick={() => handleLikeReply(reply._id)} className="text-blue-500 hover:text-blue-700">
+                                {likedReplies[reply._id] ? '💙' : '🤍'} {/* Icône de cœur */}
+                            </button>
+                            <span className="ml-2 text-gray-600">{reply.likes}</span> {/* Compteur de likes */}
+                        </div>
+                        
                         {reply.replies?.length > 0 && (
                             <div className="ml-4">
                                 <a href="#!" onClick={() => toggleShowReplies(reply._id)} className="text-sm text-blue-500 hover:underline mt-2 block">
@@ -233,7 +242,54 @@ const ConfessionList = () => {
                 )}
             </ul>
         );
-    };                
+    }; 
+    
+    const handleLikeConfession = async (confessionId) => {
+        try {
+            const response = await fetch(`${BACKEND_URL}/api/confessions/${confessionId}/like`, {
+                method: 'PATCH',
+                credentials: 'include',  // Pour inclure les cookies si nécessaire
+            });
+            if (!response.ok) throw new Error('Erreur lors de l\'ajout du like.');
+    
+            const { likes } = await response.json();
+    
+            // Mettre à jour le nombre de likes et l'état de l'utilisateur pour la confession
+            setConfessions(prevConfessions => prevConfessions.map(confession =>
+                confession._id === confessionId ? { ...confession, likes } : confession
+            ));
+            setLikedConfessions(prev => ({ ...prev, [confessionId]: !prev[confessionId] }));
+        } catch (error) {
+            console.error(error);
+            setError('Erreur lors de l\'ajout du like.');
+        }
+    };
+    
+    const handleLikeReply = async (replyId) => {
+        try {
+            const response = await fetch(`${BACKEND_URL}/api/replies/${replyId}/like`, {
+                method: 'PATCH',
+                credentials: 'include',
+            });
+            if (!response.ok) throw new Error('Erreur lors de l\'ajout du like.');
+    
+            const { likes } = await response.json();
+    
+            // Mettre à jour le nombre de likes et l'état de l'utilisateur pour la réponse
+            setConfessions(prevConfessions =>
+                prevConfessions.map(confession => ({
+                    ...confession,
+                    replies: confession.replies.map(reply =>
+                        reply._id === replyId ? { ...reply, likes } : reply
+                    ),
+                }))
+            );
+            setLikedReplies(prev => ({ ...prev, [replyId]: !prev[replyId] }));
+        } catch (error) {
+            console.error(error);
+            setError('Erreur lors de l\'ajout du like.');
+        }
+    };    
 
     return (
         <div className="container mx-auto mt-8 p-4">
@@ -278,6 +334,12 @@ const ConfessionList = () => {
                         {confession.imageUrl && (
                             <img src={confession.imageUrl} alt="Confession" className="mb-4 max-h-64 w-auto mx-auto rounded-lg" />
                         )}
+                        <div className="flex items-center">
+                            <button onClick={() => handleLikeConfession(confession._id)} className="text-blue-500 hover:text-blue-700">
+                                {likedConfessions[confession._id] ? '💙' : '🤍'} {/* Icône de cœur */}
+                            </button>
+                            <span className="ml-2 text-gray-600">{confession.likes}</span> {/* Compteur de likes */}
+                        </div>
                         {renderReplies(confession.replies, confession._id, true)}
                     </li>
                 ))}
