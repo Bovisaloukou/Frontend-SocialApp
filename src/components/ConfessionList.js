@@ -265,7 +265,7 @@ const ConfessionList = () => {
                         {confession.imageUrl && (
                             <img src={confession.imageUrl} alt="Confession" className="mb-4 max-h-64 w-auto mx-auto rounded-lg" />
                         )}
-                        {renderReplies(confession.replies, confession._id)}
+                        {renderReplies(confession.replies, confession._id, true)}
                     </li>
                 ))}
                 {loading && <p className="text-center text-gray-500">Chargement des confessions...</p>}
