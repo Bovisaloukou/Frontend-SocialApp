@@ -37,6 +37,8 @@ const ConfessionList = () => {
             if (!response.ok) throw new Error('Erreur lors de la récupération des confessions.');
             const data = await response.json();
 
+            console.log(data);
+
             const updatedLikedConfessions = {};
             data.forEach(confession => {
                 updatedLikedConfessions[confession._id] = confession.likedByCurrentUser; // Met à jour en fonction du backend
