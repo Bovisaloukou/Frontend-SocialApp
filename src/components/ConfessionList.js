@@ -44,7 +44,7 @@ const ConfessionList = () => {
             if (!response.ok) throw new Error('Erreur lors de la récupération des confessions.');
             const data = await response.json();
 
-            console.log(data);
+            //console.log(data);
     
             // Initialiser l'état des likes pour chaque confession
             const updatedLikedConfessions = {};
