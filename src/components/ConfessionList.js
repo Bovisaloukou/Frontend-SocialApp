@@ -87,7 +87,8 @@ const ConfessionList = () => {
         if (selectedImage && selectedImage.file) {
             formData.append('image', selectedImage.file);
         }
-    
+        
+        console.log(formData);
         try {
             const response = await fetch(`${BACKEND_URL}/api/confessions`, {
                 method: 'POST',
