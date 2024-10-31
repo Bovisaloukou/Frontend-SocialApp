@@ -382,14 +382,7 @@ const ConfessionList = () => {
                     <li key={confession._id} className="bg-white p-6 shadow-lg rounded-lg border border-gray-200 max-w-2xl mx-auto">
                         {/* Date de la confession alignée à droite */}
                         <p className="text-sm text-gray-500 text-right"><em>{new Date(confession.createdAt).toLocaleString()}</em></p>
-                        <p className="text-gray-800 mb-4" style={{ wordWrap: 'break-word' }}>
-                            {confession.content.split(/\r?\n/).map((line, index) => (
-                                <React.Fragment key={index}>
-                                {line}
-                                <br />
-                                </React.Fragment>
-                            ))}
-                        </p>
+                        <p className="text-gray-800 mb-4" style={{ wordWrap: 'break-word' }}>{confession.content}</p>
                         {confession.imageUrl && (
                             <img src={confession.imageUrl} alt="Confession" className="mb-4 max-h-64 w-auto mx-auto rounded-lg" />
                         )}
